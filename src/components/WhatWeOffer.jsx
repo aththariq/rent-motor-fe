@@ -18,7 +18,7 @@ const WhatWeOffer = () => {
           </p>
           <p className="mt-5">
             <a
-              className="inline-flex items-center gap-x-1 text-sm text-primary decoration-2 hover:underline focus:outline-none focus:underline font-medium"
+              className="inline-flex items-center gap-x-1 text-sm text-primary-dark decoration-2 hover:underline focus:outline-none focus:underline font-medium"
               href="#"
             >
               Hubungi kami untuk informasi lebih lanjut
