@@ -1,16 +1,17 @@
 import React from "react";
 import logo from "../assets/logo.svg";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
-    <header className="bg-white">
+    <header className="bg-white ">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="md:flex md:items-center md:gap-12">
-            <a className="block text-teal-600" href="#">
+            <Link className="block text-teal-600" to="/">
               <span className="sr-only">Home</span>
               <img src={logo} className="h-11" />
-            </a>
+            </Link>
           </div>
 
           <div className="hidden md:block">
@@ -41,20 +42,20 @@ function Navbar() {
 
           <div className="flex items-center gap-4">
             <div className="sm:flex sm:gap-4">
-              <a
+              <Link
+                to="/login"
                 className="rounded-md bg-primary-dark hover:bg-primary-light hover:text-primary-dark px-5 py-2.5 text-sm font-medium text-white shadow transform transition hover:scale-105 duration-300"
-                href="#"
               >
                 Login
-              </a>
+              </Link>
 
               <div className="hidden sm:flex">
-                <a
+                <Link
                   className="rounded-md bg-gray-100 hover:bg-gray-300 px-5 py-2.5 text-sm font-medium text-primary-dark transform transition hover:scale-105 duration-300"
-                  href="#"
+                  to="/signup"
                 >
                   Register
-                </a>
+                </Link>
               </div>
             </div>
 

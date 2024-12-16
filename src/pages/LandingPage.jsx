@@ -4,20 +4,18 @@ import Testimonials from "../components/Testimonials";
 import WhatWeOffer from "../components/WhatWeOffer";
 import FaQ from "../components/FaQ";
 import Footer from "../components/Footer";
-import Signup from "../components/Signup";
-import Login from "../components/Login";
+import Navbar from "../components/Navbar";
 
 const LandingPage = () => {
   return (
     <div>
+      <Navbar />
       <HeroSection />
       <Statistic />
       <WhatWeOffer />
       <Testimonials />
       <FaQ />
       <Footer />
-      <Signup />
-      <Login />
     </div>
   );
 };

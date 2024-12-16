@@ -20,6 +20,8 @@ const Testimonials = () => {
         },
       },
     },
+    duration: 6000, 
+    easing: "cubic-bezier(0.25, 0.1, 0.25, 1)", 
   });
 
   const testimonialsData = [
@@ -63,7 +65,7 @@ const Testimonials = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       instanceRef.current?.next();
-    }, 4000);
+    }, 6500);
     return () => clearInterval(interval);
   }, [instanceRef]);
 
