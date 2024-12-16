@@ -44,9 +44,9 @@ const Login = () => {
               <div>
                 <h2 className="text-2xl font-bold sm:text-3xl">Motoran</h2>
                 <p className="max-w-xl mt-3">
-                  Motoran, layanan sewa motor digital yang praktis, cepat, dan
-                  aman. Pilih, pesan, dan nikmati transportasi tanpa ribet kapan
-                  saja! 🚀
+                  Layanan sewa motor digital yang praktis, cepat, dan aman.
+                  Pilih, pesan, dan nikmati transportasi tanpa ribet kapan saja!
+                  🚀
                 </p>
               </div>
             </div>
@@ -63,12 +63,13 @@ const Login = () => {
                   />
                 </div>
 
-                <p className="mt-3 text-gray-500 text-left">
-                  Sign in to access your account
+                <h1 className="text-left text-black text-2xl font-bold">Selamat datang di Motoran!</h1>
+                <p className="mt-1 text-gray-500 text-left pr-12">
+                  Silahkan masuk ke akun Anda untuk melakukan penyewaan motor.
                 </p>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-7">
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div>
                     <label
@@ -126,7 +127,7 @@ const Login = () => {
                   </div>
 
                   <div className="mt-6">
-                    <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-300 transform bg-primary-dark rounded-lg hover:bg-secondary focus:outline-none focus:bg-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                    <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-300 transform bg-secondary rounded-lg hover:bg-primary-dark focus:outline-none focus:bg-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                       Sign in
                     </button>
                   </div>
