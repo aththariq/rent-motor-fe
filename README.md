@@ -99,12 +99,6 @@ rent-motor-fe/
 
 ---
 
-## Kontributor
-
-Kami menyambut kontribusi dari siapa saja untuk meningkatkan proyek ini. Silakan buat pull request atau diskusikan ide Anda melalui issue di repository ini.
-
----
-
 ## Lisensi
 
 Proyek ini dikembangkan untuk keperluan akademik dan tidak dimaksudkan untuk distribusi komersial. Hak cipta sepenuhnya milik tim pengembang.
@@ -115,6 +109,6 @@ Proyek ini dikembangkan untuk keperluan akademik dan tidak dimaksudkan untuk dis
 
 Jika Anda memiliki pertanyaan atau saran terkait proyek ini, Anda dapat menghubungi kami melalui email:
 
-- Aththariq Lisan Quran D. S.: aththariqlisan@example.com
+- Aththariq Lisan Quran D. S.: aththariqlisan@gmail.com
 
 Terima kasih telah menggunakan layanan kami!
