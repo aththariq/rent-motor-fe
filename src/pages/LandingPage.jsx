@@ -4,6 +4,8 @@ import Testimonials from "../components/Testimonials";
 import WhatWeOffer from "../components/WhatWeOffer";
 import FaQ from "../components/FaQ";
 import Footer from "../components/Footer";
+import Signup from "../components/Signup";
+import Login from "../components/Login";
 
 const LandingPage = () => {
   return (
@@ -14,6 +16,8 @@ const LandingPage = () => {
       <Testimonials />
       <FaQ />
       <Footer />
+      <Signup />
+      <Login />
     </div>
   );
 };
