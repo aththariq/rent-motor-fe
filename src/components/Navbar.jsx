@@ -9,7 +9,7 @@ function Navbar() {
           <div className="md:flex md:items-center md:gap-12">
             <a className="block text-teal-600" href="#">
               <span className="sr-only">Home</span>
-              <img src={logo} className="h-8" />
+              <img src={logo} className="h-11" />
             </a>
           </div>
 
