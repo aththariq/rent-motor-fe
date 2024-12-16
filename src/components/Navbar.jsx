@@ -9,7 +9,7 @@ function Navbar() {
           <div className="md:flex md:items-center md:gap-12">
             <a className="block text-teal-600" href="#">
               <span className="sr-only">Home</span>
-              <img src={logo} className="h-8" />
+              <img src={logo} className="h-11" />
             </a>
           </div>
 
@@ -42,7 +42,7 @@ function Navbar() {
           <div className="flex items-center gap-4">
             <div className="sm:flex sm:gap-4">
               <a
-                className="rounded-md bg-primary-dark px-5 py-2.5 text-sm font-medium text-white shadow"
+                className="rounded-md bg-primary-dark hover:bg-primary-light hover:text-primary-dark px-5 py-2.5 text-sm font-medium text-white shadow"
                 href="#"
               >
                 Login
@@ -50,7 +50,7 @@ function Navbar() {
 
               <div className="hidden sm:flex">
                 <a
-                  className="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-primary-dark"
+                  className="rounded-md bg-gray-100 hover:bg-gray-300 px-5 py-2.5 text-sm font-medium text-primary-dark"
                   href="#"
                 >
                   Register
