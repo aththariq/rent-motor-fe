@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/react-countup": "^4.3.0",
+    "framer-motion": "^11.15.0",
     "keen-slider": "^6.8.6",
     "preline": "^2.6.0",
     "react": "^18.3.1",

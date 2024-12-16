@@ -42,7 +42,7 @@ function Navbar() {
           <div className="flex items-center gap-4">
             <div className="sm:flex sm:gap-4">
               <a
-                className="rounded-md bg-primary-dark hover:bg-primary-light hover:text-primary-dark px-5 py-2.5 text-sm font-medium text-white shadow"
+                className="rounded-md bg-primary-dark hover:bg-primary-light hover:text-primary-dark px-5 py-2.5 text-sm font-medium text-white shadow transform transition hover:scale-105 duration-300"
                 href="#"
               >
                 Login
@@ -50,7 +50,7 @@ function Navbar() {
 
               <div className="hidden sm:flex">
                 <a
-                  className="rounded-md bg-gray-100 hover:bg-gray-300 px-5 py-2.5 text-sm font-medium text-primary-dark"
+                  className="rounded-md bg-gray-100 hover:bg-gray-300 px-5 py-2.5 text-sm font-medium text-primary-dark transform transition hover:scale-105 duration-300"
                   href="#"
                 >
                   Register

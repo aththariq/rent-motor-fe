@@ -1,13 +1,25 @@
+import { motion } from 'framer-motion'; // Added import
+
 const FaQ = () => {
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 space-y-8">
+    <motion.div
+      className="max-w-4xl mx-auto py-12 px-4 space-y-8"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ amount: 0.3, once: true }}
+      transition={{ duration: 0.5 }}
+    >
       <h1 className="text-3xl font-semibold text-gray-900 text-center">
         Frequently Asked Questions
       </h1>
 
       <div className="space-y-4">
-        <details
+        <motion.details
           className="group [&_summary::-webkit-details-marker]:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.3, once: true }}
+          transition={{ delay: 0.1, duration: 0.5 }}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900">
             <h2 className="font-medium">
@@ -35,9 +47,15 @@ const FaQ = () => {
             kebutuhan Anda, isi formulir pemesanan, dan konfirmasi pembayaran.
             Setelah itu, motor akan siap Anda gunakan.
           </p>
-        </details>
+        </motion.details>
 
-        <details className="group [&_summary::-webkit-details-marker]:hidden">
+        <motion.details
+          className="group [&_summary::-webkit-details-marker]:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.3, once: true }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
           <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900">
             <h2 className="font-medium">
               Apa saja persyaratan untuk menyewa motor?
@@ -65,8 +83,14 @@ const FaQ = () => {
             Persyaratan tambahan dapat dilihat di halaman syarat dan ketentuan
             kami.
           </p>
-        </details>
-        <details className="group [&_summary::-webkit-details-marker]:hidden">
+        </motion.details>
+        <motion.details
+          className="group [&_summary::-webkit-details-marker]:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.3, once: true }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
           <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900">
             <h2 className="font-medium">
               Apakah tersedia layanan antar-jemput motor?
@@ -93,9 +117,15 @@ const FaQ = () => {
             tambahan. Anda dapat memilih lokasi antar-jemput saat melakukan
             pemesanan.
           </p>
-        </details>
+        </motion.details>
 
-        <details className="group [&_summary::-webkit-details-marker]:hidden">
+        <motion.details
+          className="group [&_summary::-webkit-details-marker]:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.3, once: true }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
           <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900">
             <h2 className="font-medium">
               Apakah motor yang disewa sudah termasuk bensin?
@@ -121,9 +151,15 @@ const FaQ = () => {
             Motor disediakan dengan bensin minimal 1 liter. Anda diharapkan
             mengisi ulang bahan bakar sesuai kebutuhan selama masa sewa.
           </p>
-        </details>
+        </motion.details>
 
-        <details className="group [&_summary::-webkit-details-marker]:hidden">
+        <motion.details
+          className="group [&_summary::-webkit-details-marker]:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.3, once: true }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
           <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900">
             <h2 className="font-medium">
               Berapa lama durasi sewa yang tersedia?
@@ -150,9 +186,15 @@ const FaQ = () => {
             mingguan, hingga bulanan. Anda dapat memilih durasi yang sesuai
             dengan kebutuhan Anda.
           </p>
-        </details>
+        </motion.details>
 
-        <details className="group [&_summary::-webkit-details-marker]:hidden">
+        <motion.details
+          className="group [&_summary::-webkit-details-marker]:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ amount: 0.3, once: true }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
           <summary className="flex cursor-pointer items-center justify-between gap-1.5 rounded-lg bg-gray-50 p-4 text-gray-900">
             <h2 className="font-medium">
               Motor apa saja yang tersedia untuk disewa?
@@ -179,9 +221,9 @@ const FaQ = () => {
             hingga motor sport. Anda dapat melihat katalog motor lengkap kami di
             halaman pemesanan.
           </p>
-        </details>
+        </motion.details>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

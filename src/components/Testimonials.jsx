@@ -1,5 +1,7 @@
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
+import { useEffect } from "react";
+import { motion } from "framer-motion";
 
 const Testimonials = () => {
   const [sliderRef, instanceRef] = useKeenSlider({
@@ -19,6 +21,7 @@ const Testimonials = () => {
       },
     },
   });
+
   const testimonialsData = [
     {
       id: 1,
@@ -57,8 +60,21 @@ const Testimonials = () => {
     },
   ];
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      instanceRef.current?.next();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [instanceRef]);
+
   return (
-    <section className="bg-gray-50">
+    <motion.section
+      className="bg-gray-50"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ amount: 0.2, once: true }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="mx-auto max-w-[1340px] px-4 py-12 sm:px-6 lg:me-0 lg:py-16 lg:pe-0 lg:ps-8 xl:py-24">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-center lg:gap-16">
           <div className="max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
@@ -193,7 +209,7 @@ const Testimonials = () => {
           </button>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

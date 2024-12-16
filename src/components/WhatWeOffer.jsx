@@ -1,8 +1,29 @@
 import React from "react";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.3,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const WhatWeOffer = () => {
   return (
-    <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+    <motion.div
+      className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true, amount: 0.5 }}
+    >
       {/* Grid */}
       <div className="grid md:grid-cols-2 gap-12">
         {/* Left Column */}
@@ -42,9 +63,15 @@ const WhatWeOffer = () => {
         {/* End Left Column */}
 
         {/* Right Column */}
-        <div className="space-y-6 lg:space-y-10">
+        <motion.div
+          className="space-y-6 lg:space-y-10"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+        >
           {/* Icon Block 1 */}
-          <div className="flex gap-x-5 sm:gap-x-8">
+          <motion.div className="flex gap-x-5 sm:gap-x-8" variants={itemVariants}>
             <span className="shrink-0 inline-flex justify-center items-center size-[46px] rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm mx-auto dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -72,11 +99,11 @@ const WhatWeOffer = () => {
                 kebutuhan Anda tanpa batasan waktu.
               </p>
             </div>
-          </div>
+          </motion.div>
           {/* End Icon Block 1 */}
 
           {/* Icon Block 2 */}
-          <div className="flex gap-x-5 sm:gap-x-8">
+          <motion.div className="flex gap-x-5 sm:gap-x-8" variants={itemVariants}>
             <span className="shrink-0 inline-flex justify-center items-center size-[46px] rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm mx-auto dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200">
               <svg
                 className="shrink-0 size-5"
@@ -105,11 +132,11 @@ const WhatWeOffer = () => {
                 lancar.
               </p>
             </div>
-          </div>
+          </motion.div>
           {/* End Icon Block 2 */}
 
           {/* Icon Block 3 */}
-          <div className="flex gap-x-5 sm:gap-x-8">
+          <motion.div className="flex gap-x-5 sm:gap-x-8" variants={itemVariants}>
             <span className="shrink-0 inline-flex justify-center items-center size-[46px] rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm mx-auto dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200">
               <svg
                 className="shrink-0 size-5"
@@ -127,8 +154,7 @@ const WhatWeOffer = () => {
                 <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z" />
               </svg>
             </span>
-            <div className="grow">
-              <h3 className="text-base sm:text-lg font-semibold text-secondary">
+            <div className="grow">              <h3 className="text-base sm:text-lg font-semibold text-secondary">
                 Mudah dan Terjangkau
               </h3>
               <p className="mt-1 text-gray-600 dark:text-neutral-400 text-justify mr-5">
@@ -137,13 +163,13 @@ const WhatWeOffer = () => {
                 kebutuhan perjalanan Anda.
               </p>
             </div>
-          </div>
+          </motion.div>
           {/* End Icon Block 3 */}
-        </div>
+        </motion.div>
         {/* End Right Column */}
       </div>
       {/* End Grid */}
-    </div>
+    </motion.div>
   );
 };
 
