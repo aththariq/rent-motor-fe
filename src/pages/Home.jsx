@@ -26,7 +26,7 @@ const Home = () => {
   );
 
   return (
-    <div>t
+    <div>
       <SearchBar onSearch={handleSearch} />
       {filteredMotor.map((motor, index) => (
         <CardMotor key={index} {...motor} />
