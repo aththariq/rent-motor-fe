@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import axios from "axios";
+import { toast } from "sonner";
 
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -40,11 +41,19 @@ const Login = () => {
         }
       );
       localStorage.setItem("token", response.data.token);
-      alert("Login berhasil!");
-      navigate("/product"); // Redirect ke halaman orders
+      toast.success("Registrasi berhasil! Selamat datang!");
+      console.log(response.data);
+      navigate("/home");
     } catch (error) {
-      console.error("Login Error:", error.response.data);
-      alert("Login gagal: " + error.response.data.message);
+      // Cek status error 400
+      if (error.response?.status === 400) {
+        toast.error("Akun ini sudah terdaftar. Gunakan email yang lain");
+      } else {
+        // Pesan default untuk error lain
+        toast.error(
+          error.response?.data?.message || "Terjadi kesalahan saat registrasi"
+        );
+      }
     }
   };
 
