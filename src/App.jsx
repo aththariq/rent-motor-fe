@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route,  } from "react-router-dom";
-
+import { Toaster } from "sonner";
 import LandingPage from "./pages/LandingPage";
 
 import Login from "./pages/Login";
@@ -9,6 +9,7 @@ import Cards from "./pages/ProductCard"
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" richColors /> {/* Initialize Toaster */}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />

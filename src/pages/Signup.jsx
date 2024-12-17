@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { Toaster, toast } from "sonner";
+import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 
 const schema = Yup.object().shape({
   name: Yup.string()
@@ -45,13 +47,21 @@ const Signup = () => {
           password: data.password,
         }
       );
-      alert("Registrasi berhasil!");
+      toast.success("Registrasi berhasil! Selamat datang!");
       console.log(response.data);
     } catch (error) {
-      console.error("Error saat registrasi:", error.response?.data);
-      alert("Registrasi gagal: " + (error.response?.data?.message || "Terjadi kesalahan"));
+      // Cek status error 400
+      if (error.response?.status === 400) {
+        toast.error("Akun ini sudah terdaftar. Gunakan email yang lain");
+      } else {
+        // Pesan default untuk error lain
+        toast.error(
+          error.response?.data?.message || "Terjadi kesalahan saat registrasi"
+        );
+      }
     }
   };
+  
 
   return (
     <div>
