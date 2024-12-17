@@ -7,12 +7,12 @@ import { IoEye, IoEyeOff } from "react-icons/io5";
 
 const schema = Yup.object().shape({
   email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required")
-    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
+      .email("Email tidak valid")
+      .required("Email wajib diisi")
+      .matches(/^[^\s@]+@[^\s@]+\.(com|org|net|ac\.id|co\.uk)$/, "Email tidak valid"),
   password: Yup.string()
-    .required("Password is required")
-    .min(8, "Password must be at least 8 characters"),
+      .required("Password wajib diisi")
+      .min(8, "Password minimal 8 karakter"),
 });
 
 const Login = () => {
@@ -20,8 +20,10 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors },
+    trigger,
   } = useForm({
     resolver: yupResolver(schema),
+    mode: "onChange",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -76,7 +78,7 @@ const Login = () => {
                       htmlFor="email"
                       className="block mb-2 text-sm text-gray-600 "
                     >
-                      Email Address
+                      Alamat Email <strong className="text-red-500">*</strong>
                     </label>
                     <input
                       type="email"
@@ -84,7 +86,10 @@ const Login = () => {
                       id="email"
                       placeholder="example@example.com"
                       {...register("email")}
-                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                      className={`"block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" ${
+                        errors.email ? "border-red-500" : "border-gray-300"
+                      }`}
+                      onBlur={() => trigger("email")}
                     />
                     {errors.email && (
                       <p className="text-red-500">{errors.email.message}</p>
@@ -97,13 +102,13 @@ const Login = () => {
                         htmlFor="password"
                         className="text-sm text-gray-600 "
                       >
-                        Password
+                        Kata Sandi <strong className="text-red-500">*</strong>
                       </label>
                       <a
                         href="#"
                         className="text-sm text-gray-400 focus:text-blue-500 hover:text-blue-500 hover:underline"
                       >
-                        Forgot password?
+                        Lupa Password?
                       </a>
                     </div>
                     <input
@@ -112,11 +117,14 @@ const Login = () => {
                       id="password"
                       placeholder="Your Password"
                       {...register("password")}
-                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                      className={`"block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" ${
+                        errors.email ? "border-red-500" : "border-gray-300"
+                      }`}
+                      onBlur={() => trigger("password")}
                     />
                     <button
                       type="button"
-                      className="absolute right-4 top-10 text-gray-600"
+                      className="absolute right-4 top-12 text-gray-600"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <IoEyeOff /> : <IoEye />}
@@ -128,7 +136,7 @@ const Login = () => {
 
                   <div className="mt-6">
                     <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-300 transform bg-secondary rounded-lg hover:bg-primary-dark focus:outline-none focus:bg-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-                      Sign in
+                      Masuk
                     </button>
                   </div>
                 </form>
@@ -139,7 +147,7 @@ const Login = () => {
                     to="/signup"
                     className="text-primary-dark focus:outline-none focus:underline hover:underline"
                   >
-                    Sign up
+                    Registrasi
                   </Link>
                   .
                 </p>

@@ -23,7 +23,7 @@ function Navbar() {
                     href="#"
                   >
                     {" "}
-                    About{" "}
+                    Tentang{" "}
                   </a>
                 </li>
 
@@ -33,7 +33,7 @@ function Navbar() {
                     href="#"
                   >
                     {" "}
-                    Services{" "}
+                    Layanan{" "}
                   </a>
                 </li>
               </ul>
@@ -46,7 +46,7 @@ function Navbar() {
                 to="/login"
                 className="rounded-md bg-primary-dark hover:bg-primary-light hover:text-primary-dark px-5 py-2.5 text-sm font-medium text-white shadow transform transition hover:scale-105 duration-300"
               >
-                Login
+                Masuk
               </Link>
 
               <div className="hidden sm:flex">
@@ -54,7 +54,7 @@ function Navbar() {
                   className="rounded-md bg-gray-100 hover:bg-gray-300 px-5 py-2.5 text-sm font-medium text-primary-dark transform transition hover:scale-105 duration-300"
                   to="/signup"
                 >
-                  Register
+                  Registrasi
                 </Link>
               </div>
             </div>
