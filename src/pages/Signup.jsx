@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { IoEye, IoEyeOff } from "react-icons/io5";
-import { Alert } from "@/components/ui/alert"
 
 const schema = Yup.object().shape({
   name: Yup.string()
