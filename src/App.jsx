@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Cards from "./pages/ProductCard"
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/product" element={<Cards />} />
       </Routes>
     </Router>
   );

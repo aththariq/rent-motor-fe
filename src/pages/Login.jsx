@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Tambahkan useNavigate di sini
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import axios from "axios";
 
 const schema = Yup.object().shape({
   email: Yup.string()
@@ -27,9 +28,24 @@ const Login = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    // handle form submission
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post(
+        "https://api-motoran.faizath.com/login",
+        {
+          email: data.email,
+          password: data.password,
+        }
+      );
+      localStorage.setItem("token", response.data.token);
+      alert("Login berhasil!");
+      navigate("/product"); // Redirect ke halaman orders
+    } catch (error) {
+      console.error("Login Error:", error.response.data);
+      alert("Login gagal: " + error.response.data.message);
+    }
   };
 
   return (
