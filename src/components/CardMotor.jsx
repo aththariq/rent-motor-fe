@@ -36,7 +36,7 @@ const CardMotor = ({
         </div>
         <div className="flex items-center gap-1">
           <BsPeopleFill size={15} />
-          <span>{capacity}</span>
+          <span>{capacity} orang</span>
         </div>
       </div>
 
