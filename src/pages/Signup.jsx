@@ -7,15 +7,15 @@ import { IoEye, IoEyeOff } from "react-icons/io5";
 
 const schema = Yup.object().shape({
   email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required")
-    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"),
+    .email("Email tidak valid")
+    .required("Email wajib diisi")
+    .matches(/^[^\s@]+@[^\s@]+\.(com|org|net|ac\.id|co\.uk)$/, "Email tidak valid"),
   password: Yup.string()
-    .required("Password is required")
-    .min(8, "Password must be at least 8 characters"),
+    .required("Password wajib diisi")
+    .min(8, "Password minimal 8 karakter"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Confirm Password is required"),
+    .oneOf([Yup.ref("password"), null], "Konfirmasi password tidak sama dengan password")
+    .required("Konfirmasi password wajib diisi"),
 });
 
 const Signup = () => {
@@ -23,15 +23,17 @@ const Signup = () => {
     register,
     handleSubmit,
     formState: { errors },
+    trigger,
   } = useForm({
     resolver: yupResolver(schema),
+    mode: "onChange",
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Add this line
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
 
   const onSubmit = (data) => {
-    // handle form submission
+    console.log("Form Submitted:", data);
   };
 
   return (
@@ -82,7 +84,7 @@ const Signup = () => {
                       htmlFor="email"
                       className="block mb-2 text-sm text-gray-600 "
                     >
-                      Email Address
+                      Alamat Email <strong className="text-red-500">*</strong>
                     </label>
                     <input
                       type="email"
@@ -90,7 +92,10 @@ const Signup = () => {
                       id="email"
                       placeholder="example@example.com"
                       {...register("email")}
-                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                      className={`"block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" ${
+                        errors.email ? "border-red-500" : "border-gray-300"
+                      }`}
+                      onBlur={() => trigger("email")}
                     />
                     {errors.email && (
                       <p className="text-red-500">{errors.email.message}</p>
@@ -103,7 +108,7 @@ const Signup = () => {
                         htmlFor="password"
                         className="text-sm text-gray-600 "
                       >
-                        Password
+                        Kata Sandi <strong className="text-red-500">*</strong>
                       </label>
                     </div>
                     <input
@@ -112,11 +117,14 @@ const Signup = () => {
                       id="password"
                       placeholder="Your Password"
                       {...register("password")}
-                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                      className={`"block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"${
+                        errors.email ? "border-red-500" : "border-gray-300"
+                      }`}
+                      onBlur={() => trigger("password")}
                     />
                     <button
                       type="button"
-                      className="absolute right-4 top-10 text-gray-600"
+                      className="absolute right-4 top-12 text-gray-600"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <IoEyeOff /> : <IoEye />}
@@ -131,7 +139,7 @@ const Signup = () => {
                       htmlFor="confirmPassword"
                       className="block mb-2 text-sm text-gray-600 "
                     >
-                      Confirm Password
+                      Konfirmasi <strong className="text-red-500">*</strong>
                     </label>
                     <input
                       type={showConfirmPassword ? "text" : "password"} 
@@ -139,11 +147,14 @@ const Signup = () => {
                       id="confirmPassword"
                       placeholder="Confirm Your Password"
                       {...register("confirmPassword")}
-                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                      className={`"block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" ${
+                        errors.email ? "border-red-500" : "border-gray-300"
+                      }`}
+                      onBlur={() => trigger("confirmPassword")}
                     />
                     <button
                       type="button"
-                      className="absolute right-4 top-10 text-gray-600"
+                      className="absolute right-4 top-12 text-gray-600"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
                     >
                       {showConfirmPassword ? <IoEyeOff /> : <IoEye />} 
@@ -157,7 +168,7 @@ const Signup = () => {
 
                   <div className="mt-6">
                     <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-300 transform bg-secondary rounded-lg hover:bg-primary-dark focus:outline-none focus:bg-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-                      Sign in
+                      Buat Akun
                     </button>
                   </div>
                 </form>
@@ -168,7 +179,7 @@ const Signup = () => {
                     to="/login"
                     className="text-primary-dark focus:outline-none focus:underline hover:underline"
                   >
-                    Sign in
+                    Masuk
                   </Link>
                   .
                 </p>
