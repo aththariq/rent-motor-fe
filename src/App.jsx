@@ -1,10 +1,12 @@
 import { BrowserRouter as Router, Routes, Route,  } from "react-router-dom";
 import { Toaster } from "sonner";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
-
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Cards from "./pages/ProductCard"
+import Home from "./pages/Home";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/product" element={<Cards />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );
