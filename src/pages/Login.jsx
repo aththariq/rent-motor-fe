@@ -40,8 +40,11 @@ const Login = () => {
           password: data.password,
         }
       );
-      localStorage.setItem("token", response.data.token);
-      toast.success("Registrasi berhasil! Selamat datang!");
+      console.log(response.data)
+      localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("email", data.email);
+
+      toast.success("Login berhasil! Selamat datang!");
       console.log(response.data);
       navigate("/home");
     } catch (error) {

@@ -4,6 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { BsFillFuelPumpFill, BsPeopleFill } from "react-icons/bs";
 import { RiSteering2Fill } from "react-icons/ri";
+import { toast } from "sonner";
 
 const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, available }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +15,7 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
     endDate: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,43 +35,72 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
     setCustomer({ ...customer, startDate: start, endDate: end });
   };
 
-  const handleSewaClick = () => setIsOpen(true);
+  const handleSewaClick = () => {
+    console.log("Modal opened");
+    setIsOpen(true);
+  };
 
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token"); 
-      if (!token) {
-        toast.error("Token tidak ditemukan. Silakan login kembali.");
+      // Retrieve token and email from localStorage
+      const token = localStorage.getItem("token");
+      const email = localStorage.getItem("email");
+  
+      if (!token || !email) {
+        console.error("Token or email not found in localStorage");
+        toast.error("Akun Anda tidak valid. Silakan login kembali.");
         return;
       }
   
-      const formData = new FormData();
-      formData.append("phone", customer.phone);
-      formData.append("startDate", customer.startDate);
-      formData.append("endDate", customer.endDate);
-      formData.append("ktpImage", customer.uploadedImage);
+      // Construct order data
+      const orderData = {
+        email: email, // Use the retrieved email
+        orderStatus: [
+          {
+            phoneNumber: customer.phone,
+            idCard: customer.uploadedImage?.name || "No Image",
+            orderDate: new Date().toISOString(),
+            takenDate: customer.startDate?.toISOString(),
+            returnDate: customer.endDate?.toISOString(),
+            paymentStatus: "uncomplete",
+            takenStatus: "untaken",
+            returnStatus: "unreturned",
+          },
+        ],
+      };
   
-      const response = await axios.post("https://api-motoran.faizath.com/", formData, {
+      // Send API request
+      const response = await axios.post("https://api-motoran.faizath.com/orders", orderData, {
         headers: {
-          Authorization: `Bearer ${token}`, 
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`, // Include Bearer token
+          "Content-Type": "application/json",
         },
       });
   
-      console.log("Response:", response.data);
-      toast.success("Konfirmasi berhasil! Data disimpan.");
-      setIsOpen(false);
+      if (response.status === 201) {
+        toast.success("Order berhasil dibuat.");
+        setIsOpen(false);
+      } else {
+        toast.error(response.data.message || "Gagal membuat order.");
+      }
     } catch (error) {
       console.error("Error:", error);
-      toast.error(
-        error.response?.data?.message || "Terjadi kesalahan saat mengirim data."
-      );
+      if (error.response?.status === 401) {
+        toast.error("Unauthorized: Silakan login kembali.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("email");
+      } else {
+        toast.error(
+          error.response?.data?.message || "Terjadi kesalahan saat membuat order."
+        );
+      }
     } finally {
       setLoading(false);
     }
-  };
+  };  
   
+
   const onClose = () => {
     setIsOpen(false);
     setImagePreview(null);
@@ -78,7 +108,7 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
 
   return (
     <div
-      className={`relative w-80 bg-white rounded-lg shadow-lg p-4  ${
+      className={`relative w-80 bg-white rounded-lg shadow-lg p-4 ${
         available === 0 ? "opacity-50" : "opacity-100"
       }`}
     >
@@ -94,27 +124,22 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
           <p className="text-gray-500 text-sm">{type}</p>
         </div>
 
-        <img
-  src={image}
-  alt="Car"
-  className="w-full h-48 object-cover rounded-lg mb-4"
-/>
-
+        <img src={image} alt="Car" className="w-full h-48 object-cover rounded-lg mb-4" />
 
         <div className="flex justify-around text-gray-500 text-sm mb-4">
-        <div className="flex items-center gap-1">
-          <BsFillFuelPumpFill size={15} />
-          <span>{fuel}</span>
+          <div className="flex items-center gap-1">
+            <BsFillFuelPumpFill size={15} />
+            <span>{fuel}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <RiSteering2Fill size={15} />
+            <span>{transmission}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <BsPeopleFill size={15} />
+            <span>{capacity} orang</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <RiSteering2Fill size={15} />
-          <span>{transmission}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <BsPeopleFill size={15} />
-          <span>{capacity} orang</span>
-        </div>
-      </div>
 
         <div className="flex justify-between items-center">
           <p className="text-black font-bold text-lg">

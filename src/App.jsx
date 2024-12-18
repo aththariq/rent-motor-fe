@@ -7,7 +7,6 @@ import Cards from "./pages/ProductCard"
 import Home from "./pages/Home";
 import Admin from "./pages/AdminPage"
 import NotFoundPage from "./pages/NotFoundPage";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
