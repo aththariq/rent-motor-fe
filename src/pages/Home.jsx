@@ -16,6 +16,7 @@ const Home = () => {
       transmission: "Manual",
       capacity: "4",
       price: 100000,
+      available : 1,
     },
   ];
 
