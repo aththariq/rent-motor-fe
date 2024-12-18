@@ -47,7 +47,8 @@ const Home = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex justify-center my-2">
+        <div></div>
+        <div className="flex justify-center my-2 mx-auto">
           <SearchBar onSearch={handleSearch} />
         </div>
 

@@ -16,7 +16,7 @@ const suffix = (
 const SearchBar = ({ onSearch }) => {
   return (
     <Space direction="vertical">
-      <Search placeholder="Cari motor.." onSearch={onSearch} enterButton className="w-96"/>
+      <Search placeholder="Cari motor.." onSearch={onSearch} enterButton className="w-72 md:w-96"/>
     </Space>
   );
 };
