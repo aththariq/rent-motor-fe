@@ -47,13 +47,14 @@ const Home = () => {
         </div>
 
         {/* Search Bar */}
-        <div></div>
+        <div className="mx-6">
         <div className="flex justify-center my-2 mx-auto">
           <SearchBar onSearch={handleSearch} />
         </div>
+        </div>
 
         {/* Card Motor */}
-        <div className="flex flex-wrap justify-center gap-6 my-10">
+        <div className="flex flex-wrap justify-center gap-6 mt-10 mb-24">
           {filteredMotor.map((motor, index) => (
             <CardMotor key={index} {...motor} />
           ))}
