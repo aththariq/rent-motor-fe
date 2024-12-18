@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Cards from "./pages/ProductCard"
 import Home from "./pages/Home";
+import Admin from "./pages/AdminPage"
 import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/product" element={<Cards />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
