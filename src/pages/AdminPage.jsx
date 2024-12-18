@@ -9,13 +9,40 @@ const AdminPage = () => {
   // Fetch orders from GET /orders
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("https://api-motoran.faizath.com/");
-      setOrders(response.data.orderStatus); // Ambil daftar orders dari response
+      const token = localStorage.getItem("token");
+      console.log("Retrieved Token:", token);
+  
+      if (!token) {
+        console.error("Token not found. Redirecting to login.");
+        localStorage.removeItem("token");
+        window.location.href = "/login"; // Redirect to login page
+        return;
+      }
+  
+      const url = "https://api-motoran.faizath.com/orders";
+      console.log("Fetching orders from:", url);
+  
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      console.log("API Response:", response.data);
+      setOrders(response.data);
     } catch (error) {
-      console.error("Error fetching orders:", error);
-      toast.error("Gagal mengambil data orders.");
+      if (error.response?.status === 401) {
+        console.error("Unauthorized: Token may be invalid or expired.");
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        window.location.href = "/login"; // Redirect to login page
+      } else {
+        console.error("Error fetching orders:", error);
+        setError(error.message);
+      }
     }
-  };gi
+  };
+  
 
   useEffect(() => {
     fetchOrders();
@@ -52,7 +79,7 @@ const AdminPage = () => {
       });
 
       toast.success("Status berhasil diperbarui.");
-      fetchOrders(); // Refresh data orders
+      fetchOrders();
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Gagal memperbarui status.");
