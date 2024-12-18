@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import { BsFillFuelPumpFill, BsPeopleFill } from "react-icons/bs";
+import { RiSteering2Fill } from "react-icons/ri";
 
 const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, available }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +39,7 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      const token = localStorage.getItem("token"); 
       if (!token) {
         toast.error("Token tidak ditemukan. Silakan login kembali.");
         return;
@@ -51,7 +53,7 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
   
       const response = await axios.post("https://api-motoran.faizath.com/", formData, {
         headers: {
-          Authorization: `Bearer ${token}`, // Use retrieved token here
+          Authorization: `Bearer ${token}`, 
           "Content-Type": "multipart/form-data",
         },
       });
@@ -76,7 +78,7 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
 
   return (
     <div
-      className={`relative max-w-72 bg-white rounded-lg shadow-lg p-4 ${
+      className={`relative w-80 bg-white rounded-lg shadow-lg p-4  ${
         available === 0 ? "opacity-50" : "opacity-100"
       }`}
     >
@@ -92,13 +94,27 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
           <p className="text-gray-500 text-sm">{type}</p>
         </div>
 
-        <img src={image} alt="Car" className="w-full rounded-lg mb-4" />
+        <img
+  src={image}
+  alt="Car"
+  className="w-full h-48 object-cover rounded-lg mb-4"
+/>
+
 
         <div className="flex justify-around text-gray-500 text-sm mb-4">
-          <div>{fuel}</div>
-          <div>{transmission}</div>
-          <div>{capacity} orang</div>
+        <div className="flex items-center gap-1">
+          <BsFillFuelPumpFill size={15} />
+          <span>{fuel}</span>
         </div>
+        <div className="flex items-center gap-1">
+          <RiSteering2Fill size={15} />
+          <span>{transmission}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <BsPeopleFill size={15} />
+          <span>{capacity} orang</span>
+        </div>
+      </div>
 
         <div className="flex justify-between items-center">
           <p className="text-black font-bold text-lg">

@@ -8,7 +8,7 @@ const NavbarLogin = () => {
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0">
             <a href="/">
-              <img src={logo} alt="Logo" className="h-8 w-auto" />
+              <img src={logo} alt="Logo" className="h-10 w-auto" />
             </a>
           </div>
         </div>
