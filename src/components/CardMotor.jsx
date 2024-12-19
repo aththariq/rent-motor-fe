@@ -64,7 +64,7 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
       const response = await axios.post("https://api-motoran.faizath.com/orders", formData, {
         headers: {
           Authorization: `Bearer ${token}`, 
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       });
   
