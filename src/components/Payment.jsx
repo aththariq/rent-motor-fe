@@ -37,6 +37,14 @@ const Payment = () => {
   }, []);
 
   useEffect(() => {
+    if (!orderIdParam || !tokenParam) {
+      toast.error("Parameter orderId atau token tidak ditemukan.");
+      navigate("/");
+      return;
+    }
+  }, [orderIdParam, tokenParam, navigate]);
+
+  useEffect(() => {
     const fetchOrderData = async () => {
       if (orderDataFromState) {
         const { customer, motor } = orderDataFromState;
