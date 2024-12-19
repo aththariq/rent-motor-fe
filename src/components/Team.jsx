@@ -33,7 +33,7 @@ const Team = () => {
       github: "https://github.com/nasywaanaa",
     },
     {
-      avatar: "https://randomuser.me/api/portraits/men/86.jpg",
+      avatar: "https://www.libravatar.org/avatar/dc9dcfea8498664fa09bdb098d3fbb89fdee7e114b2d7e1e0732fc94bf5c80b7?s=128",
       name: "Muhammad Faiz",
       title: "Backend Developer",
       linkedin: "javascript:void(0)",
