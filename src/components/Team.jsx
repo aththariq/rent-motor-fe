@@ -1,4 +1,44 @@
 import React from "react";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const titleVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      delay: 0.2,
+      duration: 0.6,
+    },
+  },
+};
+
+const paragraphVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      delay: 0.4,
+      duration: 0.6,
+    },
+  },
+};
 
 const Team = () => {
   const team = [
@@ -45,19 +85,41 @@ const Team = () => {
     <section className="py-14 mx-auto bg-gray-100">
       <div className="max-w-screen-xl mx-auto px-4 md:px-8">
         <div className="max-w-xl mx-auto">
-          <h3 className="text-gray-800 text-3xl font-semibold sm:text-4xl text-center">
+          <motion.h3
+            className="text-gray-800 text-3xl font-semibold sm:text-4xl text-center"
+            variants={titleVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ amount: 0.2 }}
+          >
             Tim di Balik Motorin
-          </h3>
-          <p className="text-gray-600 mt-3 text-center">
+          </motion.h3>
+          <motion.p
+            className="text-gray-600 mt-3 text-center"
+            variants={paragraphVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ amount: 0.2 }}
+          >
             Kami mahasiswa STI angkatan 22 ITB yang mengembangkan Motorin
             sebagai tugas besar untuk mata kuliah II3120 Layanan Sistem dan
             Teknologi STI.
-          </p>
+          </motion.p>
         </div>
         <div className="mt-12">
-          <ul className="flex flex-wrap gap-14 justify-center">
+          <motion.ul
+            className="flex flex-wrap gap-14 justify-center"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ amount: 0.2 }}
+          >
             {team.map((item, idx) => (
-              <li key={idx} className="flex flex-col items-center w-48">
+              <motion.li
+                key={idx}
+                className="flex flex-col items-center w-48"
+                variants={itemVariants}
+              >
                 <div className="w-24 h-24 mb-4">
                   <img
                     src={item.avatar}
@@ -120,9 +182,9 @@ const Team = () => {
                       )}
                   </div>
                 </div>
-              </li>
+              </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         </div>
       </div>
     </section>
