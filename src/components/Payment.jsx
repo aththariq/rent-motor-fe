@@ -143,9 +143,12 @@ const Payment = () => {
       );
 
       if (response.status === 201) {
-        setPaymentSuccess(true);
+        const orderId = response.data.data.orderId; // Pastikan orderId tersedia di respons backend
+        const token = localStorage.getItem("token");
+
+        navigate(`/payment?orderId=${orderId}&token=${token}`);
       } else {
-        setPaymentError(response.data.message || "Gagal membuat order.");
+        console.error("Gagal membuat order:", response.data.message);
       }
     } catch (error) {
       console.error("Error:", error);

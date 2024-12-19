@@ -137,13 +137,19 @@ const CardMotor = ({
         });
         setIsOpen(false);
 
-        // Navigasi ke halaman payment
-        navigate("/payment", {
-          state: {
-            motor: { name, type, price, image },
-            customer,
-          },
-        });
+        // Navigasi ke halaman payment dengan menyertakan orderId dan token di URL
+        const orderId = response.data.data.orderId; // Pastikan orderId tersedia di respons backend
+        const token = localStorage.getItem("token");
+
+        if (orderId && token) {
+          navigate(`/payment?orderId=${orderId}&token=${token}`);
+        } else {
+          setAlert({
+            type: "error",
+            message: "Gagal mendapatkan informasi order.",
+            description: "Silakan coba lagi atau hubungi support.",
+          });
+        }
       } else {
         setAlert({
           type: "error",
