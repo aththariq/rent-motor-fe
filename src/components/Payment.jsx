@@ -1,19 +1,9 @@
-// Payment.js
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  Card,
-  Row,
-  Col,
-  Typography,
-  Button,
-  Alert,
-  Image,
-  Spin,
-} from "antd";
+import { Card, Row, Col, Typography, Button, Alert, Image, Spin } from "antd";
 import { toast } from "sonner";
-import { QRCode } from "antd"; 
+import { QRCode } from "antd";
 
 const { Title, Text } = Typography;
 
@@ -28,32 +18,27 @@ const Payment = () => {
   const [orderData, setOrderData] = useState(orderDataFromState || null);
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(false); // Untuk loading saat fetching order
+  const [fetching, setFetching] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState("");
 
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Fungsi untuk mendeteksi perangkat
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // Menganggap width < 768px sebagai mobile
+      setIsMobile(window.innerWidth < 768);
     };
 
-    // Inisialisasi
     handleResize();
 
-    // Menambahkan event listener untuk resize
     window.addEventListener("resize", handleResize);
 
-    // Membersihkan event listener saat komponen di-unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
     const fetchOrderData = async () => {
       if (orderDataFromState) {
-        // Jika data order sudah ada dari state, langsung set
         const { customer, motor } = orderDataFromState;
         const rentalDays = Math.ceil(
           (new Date(customer.endDate) - new Date(customer.startDate)) /
@@ -62,10 +47,8 @@ const Payment = () => {
         const total = rentalDays * motor.price;
         setTotalPrice(total);
       } else if (orderIdParam && tokenParam) {
-        // Jika diakses via QR code dengan orderId dan token di URL
         setFetching(true);
         try {
-          // Ambil order data dari API berdasarkan orderId
           const response = await axios.get(
             `https://api-motoran.faizath.com/orders/${orderIdParam}`,
             {
@@ -99,7 +82,6 @@ const Payment = () => {
           setFetching(false);
         }
       } else {
-        // Jika tidak ada data order
         toast.error("Data pesanan tidak ditemukan.");
         navigate("/");
       }
@@ -112,7 +94,6 @@ const Payment = () => {
     setLoading(true);
     setPaymentError("");
     try {
-      // Ambil token dan email dari localStorage
       const token = localStorage.getItem("token");
       const email = localStorage.getItem("email");
 
@@ -145,7 +126,6 @@ const Payment = () => {
 
       if (response.status === 201) {
         setPaymentSuccess(true);
-        // Optional: Anda dapat menambahkan navigasi atau reset data di sini
       } else {
         setPaymentError(response.data.message || "Gagal membuat order.");
       }
@@ -157,10 +137,7 @@ const Payment = () => {
         localStorage.removeItem("email");
         navigate("/login");
       } else {
-        setPaymentError(
-          error.response?.data?.message ||
-            "Terjadi kesalahan saat membuat order."
-        );
+        setPaymentError(error.response?.data?.message || ".");
       }
     } finally {
       setLoading(false);
@@ -176,7 +153,7 @@ const Payment = () => {
   }
 
   if (!orderData) {
-    return null; // Atau tampilkan pesan lain
+    return null;
   }
 
   const { motor, customer } = orderData;
@@ -185,13 +162,12 @@ const Payment = () => {
     (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
   );
 
-  // Buat URL pembayaran yang akan di-encode ke QR code
   const qrPaymentUrl = orderIdParam
     ? `${window.location.origin}/payment?orderId=${orderIdParam}&token=${tokenParam}`
     : orderDataFromState
-    ? `${window.location.origin}/payment?orderId=${orderDataFromState.orderId}&token=${localStorage.getItem(
-        "token"
-      )}`
+    ? `${window.location.origin}/payment?orderId=${
+        orderDataFromState.orderId
+      }&token=${localStorage.getItem("token")}`
     : "";
 
   return (
@@ -250,12 +226,6 @@ const Payment = () => {
                   <Text strong>Nama:</Text> {motor.name}
                   <br />
                   <Text strong>Jenis:</Text> {motor.type}
-                  <br />
-                  <Text strong>Bahan Bakar:</Text> {motor.fuel}
-                  <br />
-                  <Text strong>Transmisi:</Text> {motor.transmission}
-                  <br />
-                  <Text strong>Kapasitas:</Text> {motor.capacity} orang
                   <br />
                   <Text strong>Harga per hari:</Text> Rp{motor.price}
                 </Col>
@@ -333,7 +303,17 @@ const Payment = () => {
                   <Spin />
                 )}
               </div>
+              <div></div>
             </div>
+            <Button
+              type="default"
+              size="large"
+              onClick={() => navigate("/home")}
+              style={{ marginTop: "10px" }}
+              block
+            >
+              Batalkan
+            </Button>
           </Card>
         </Col>
       </Row>

@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { BsFillFuelPumpFill, BsPeopleFill } from "react-icons/bs";
 import { RiSteering2Fill } from "react-icons/ri";
-import { toast } from "sonner";
+import { Alert } from "antd"; // Add this import
 import { useNavigate } from "react-router-dom";
+import { DatePicker, Input, Upload, Space } from "antd"; // Updated imports
+import { InboxOutlined } from "@ant-design/icons"; // New import for Upload
+import moment from "moment";
+
+const { RangePicker } = DatePicker;
 
 const CardMotor = ({
   name,
@@ -26,6 +30,11 @@ const CardMotor = ({
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({
+    type: "",
+    message: "",
+    description: "",
+  }); // Add alert state
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -33,17 +42,27 @@ const CardMotor = ({
     setCustomer({ ...customer, [name]: value });
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setCustomer({ ...customer, uploadedImage: file });
-      setImagePreview(URL.createObjectURL(file));
+  const handleImageUpload = (info) => {
+    const { file } = info;
+    const uploadedFile = file.originFileObj || file; // Antisipasi kasus tanpa originFileObj
+    if (uploadedFile) {
+      console.log("Uploaded File:", uploadedFile);
+      setCustomer({ ...customer, uploadedImage: uploadedFile });
+      setImagePreview(URL.createObjectURL(uploadedFile));
+    } else {
+      console.error("File upload failed or is not accessible");
     }
   };
 
   const handleDateChange = (dates) => {
-    const [start, end] = dates;
-    setCustomer({ ...customer, startDate: start, endDate: end });
+    if (dates) {
+      const [start, end] = dates;
+      setCustomer({
+        ...customer,
+        startDate: start.toDate(),
+        endDate: end.toDate(),
+      });
+    }
   };
 
   const handleSewaClick = () => {
@@ -53,40 +72,34 @@ const CardMotor = ({
 
   const handleConfirm = async () => {
     setLoading(true);
+    setAlert({ type: "", message: "", description: "" }); // Reset alert
     try {
-      // Ambil token dan email dari localStorage
       const token = localStorage.getItem("token");
       const email = localStorage.getItem("email");
 
       if (!token || !email) {
-        console.error("Token atau email tidak ditemukan di localStorage");
-        toast.error("Akun Anda tidak valid. Silakan login kembali.");
+        setAlert({
+          type: "error",
+          message: "Akun Anda tidak valid",
+          description: "Silakan login kembali.",
+        });
         return;
       }
 
       const { phone, startDate, endDate, uploadedImage } = customer;
 
-      // **Validasi Tipe Data**
       if (typeof phone !== "string" || phone.trim() === "") {
         throw new Error("Nomor telepon harus diisi dengan benar.");
       }
       if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
         throw new Error("Tanggal sewa harus dipilih dengan benar.");
       }
-      if (!(uploadedImage instanceof File)) {
+      if (!uploadedImage || !(uploadedImage instanceof Blob)) {
         throw new Error("Gambar KTP harus diunggah.");
       }
 
-      // **Format Tanggal ke ISO Strings**
       const formattedStartDate = startDate.toISOString();
       const formattedEndDate = endDate.toISOString();
-      const orderData = {
-        motor: { name, type, price, image },
-        customer,
-      };
-
-      // Navigasi ke halaman Payment dengan state
-      navigate("/payment", { state: orderData });
 
       const formData = new FormData();
       formData.append("phone", phone);
@@ -94,17 +107,8 @@ const CardMotor = ({
       formData.append("endDate", formattedEndDate);
       formData.append("ktpImage", uploadedImage);
 
-      // **Logging FormData untuk Debugging**
-      console.log("Data yang dikirim:");
-      for (let [key, value] of formData.entries()) {
-        if (key === "ktpImage") {
-          console.log(`${key}:`, value.name); // Log nama file
-        } else {
-          console.log(`${key}:`, value);
-        }
-      }
+      console.log("Sending data:", Array.from(formData.entries()));
 
-      // **Kirim Permintaan API**
       const response = await axios.post(
         "https://api-motoran.faizath.com/orders",
         formData,
@@ -116,24 +120,46 @@ const CardMotor = ({
         }
       );
 
-      if (response.status === 201) {
-        toast.success("Order berhasil dibuat.");
+      console.log("Response Status:", response.status);
+      console.log("Response Data:", response.data);
+
+      // Validasi respons sukses berdasarkan status HTTP dan pesan respons
+      if (
+        (response.status === 200 || response.status === 201) &&
+        response.data.status === "success"
+      ) {
+        console.log("API Response:", response.data);
+        setAlert({
+          type: "success",
+          message: "Order berhasil dibuat.",
+          description:
+            response.data.message || "Pesanan Anda telah berhasil dibuat.",
+        });
         setIsOpen(false);
+
+        // Navigasi ke halaman payment
+        navigate("/payment", {
+          state: {
+            motor: { name, type, price, image },
+            customer,
+          },
+        });
       } else {
-        toast.error(response.data.message || "Gagal membuat order.");
+        setAlert({
+          type: "error",
+          message: "Gagal Membuat Order",
+          description: response.data.message || "Terjadi kesalahan.",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      if (error.response?.status === 401) {
-        toast.error("Unauthorized: Silakan login kembali.");
-        localStorage.removeItem("token");
-        localStorage.removeItem("email");
-      } else {
-        toast.error(
+      setAlert({
+        type: "error",
+        message: "Terjadi Kesalahan",
+        description:
           error.response?.data?.message ||
-            "Terjadi kesalahan saat membuat order."
-        );
-      }
+          "Terjadi kesalahan saat membuat order.",
+      });
     } finally {
       setLoading(false);
     }
@@ -202,6 +228,19 @@ const CardMotor = ({
         </div>
       </div>
 
+      {/* Display Alert */}
+      {alert.message && (
+        <Alert
+          message={alert.message}
+          description={alert.description}
+          type={alert.type}
+          showIcon
+          closable
+          onClose={() => setAlert({ type: "", message: "", description: "" })}
+          style={{ marginBottom: "20px" }}
+        />
+      )}
+
       {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center z-50">
@@ -212,41 +251,54 @@ const CardMotor = ({
 
             {/* Phone Number */}
             <label className="block text-sm font-medium mb-1 text-gray-600">
-              No Telepon/Whatsapp
+              No Telepon/Whatsapp <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               type="tel"
               name="phone"
               placeholder="Contoh: 08123456789"
-              className="border w-full p-2 rounded mb-4"
+              className="mb-4"
               value={customer.phone}
               onChange={handleInputChange}
             />
 
             {/* Date Range Picker */}
             <label className="block text-sm font-medium mb-1 text-gray-600">
-              Pilih Tanggal Sewa
+              Pilih Tanggal Sewa <span className="text-red-500">*</span>
             </label>
-            <DatePicker
-              selected={customer.startDate}
-              onChange={handleDateChange}
-              startDate={customer.startDate}
-              endDate={customer.endDate}
-              selectsRange
-              inline
-              className="w-full"
-            />
+            <Space direction="vertical" size={12}>
+              <RangePicker
+                value={[
+                  customer.startDate ? moment(customer.startDate) : null,
+                  customer.endDate ? moment(customer.endDate) : null,
+                ]}
+                onChange={handleDateChange}
+              />
+            </Space>
 
             {/* Upload Image */}
             <label className="block text-sm font-medium mb-1 text-gray-600 mt-4">
-              Upload KTP
+              Upload KTP <span className="text-red-500">*</span>
             </label>
-            <input
-              type="file"
-              accept="image/*"
+            <Upload.Dragger
+              name="ktpImage"
+              multiple={false}
+              action="https://api-motoran.faizath.com/orders"
               onChange={handleImageUpload}
-              className="block w-full text-gray-500 border rounded-lg cursor-pointer p-2 mb-4"
-            />
+              beforeUpload={() => false} // Prevent automatic upload
+              className="mb-4"
+            >
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single upload. Strictly prohibited from uploading
+                company data or other banned files.
+              </p>
+            </Upload.Dragger>
 
             {/* Image Preview */}
             {imagePreview && (
