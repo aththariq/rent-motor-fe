@@ -54,7 +54,7 @@ const Login = () => {
       } else {
         // Pesan default untuk error lain
         toast.error(
-          error.response?.data?.message || "Terjadi kesalahan saat registrasi"
+          error.response?.data?.message || "Terjadi kesalahan saat login"
         );
       }
     }

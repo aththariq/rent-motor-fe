@@ -5,8 +5,18 @@ import axios from "axios";
 import { BsFillFuelPumpFill, BsPeopleFill } from "react-icons/bs";
 import { RiSteering2Fill } from "react-icons/ri";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
-const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, available }) => {
+const CardMotor = ({
+  name,
+  type,
+  image,
+  fuel,
+  transmission,
+  capacity,
+  price,
+  available,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [customer, setCustomer] = useState({
     phone: "",
@@ -16,6 +26,7 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -43,31 +54,68 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      // Retrieve token and email from localStorage
+      // Ambil token dan email dari localStorage
       const token = localStorage.getItem("token");
       const email = localStorage.getItem("email");
-  
+
       if (!token || !email) {
-        console.error("Token or email not found in localStorage");
+        console.error("Token atau email tidak ditemukan di localStorage");
         toast.error("Akun Anda tidak valid. Silakan login kembali.");
         return;
       }
-  
+
+      const { phone, startDate, endDate, uploadedImage } = customer;
+
+      // **Validasi Tipe Data**
+      if (typeof phone !== "string" || phone.trim() === "") {
+        throw new Error("Nomor telepon harus diisi dengan benar.");
+      }
+      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+        throw new Error("Tanggal sewa harus dipilih dengan benar.");
+      }
+      if (!(uploadedImage instanceof File)) {
+        throw new Error("Gambar KTP harus diunggah.");
+      }
+
+      // **Format Tanggal ke ISO Strings**
+      const formattedStartDate = startDate.toISOString();
+      const formattedEndDate = endDate.toISOString();
+      const orderData = {
+        motor: { name, type, price, image },
+        customer,
+      };
+
+      // Navigasi ke halaman Payment dengan state
+      navigate("/payment", { state: orderData });
+
       const formData = new FormData();
-      formData.append("phone", customer.phone);
-      formData.append("startDate", customer.startDate);
-      formData.append("endDate", customer.endDate);
-      formData.append("ktpImage", customer.uploadedImage);
-  
-  
-      // Send API request
-      const response = await axios.post("https://api-motoran.faizath.com/orders", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`, 
-          "Content-Type": "multipart/form-data",
-        },
-      });
-  
+      formData.append("phone", phone);
+      formData.append("startDate", formattedStartDate);
+      formData.append("endDate", formattedEndDate);
+      formData.append("ktpImage", uploadedImage);
+
+      // **Logging FormData untuk Debugging**
+      console.log("Data yang dikirim:");
+      for (let [key, value] of formData.entries()) {
+        if (key === "ktpImage") {
+          console.log(`${key}:`, value.name); // Log nama file
+        } else {
+          console.log(`${key}:`, value);
+        }
+      }
+
+      // **Kirim Permintaan API**
+      const response = await axios.post(
+        "https://api-motoran.faizath.com/orders",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
       if (response.status === 201) {
         toast.success("Order berhasil dibuat.");
         setIsOpen(false);
@@ -82,14 +130,14 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
         localStorage.removeItem("email");
       } else {
         toast.error(
-          error.response?.data?.message || "Terjadi kesalahan saat membuat order."
+          error.response?.data?.message ||
+            "Terjadi kesalahan saat membuat order."
         );
       }
     } finally {
       setLoading(false);
     }
-  };  
-  
+  };
 
   const onClose = () => {
     setIsOpen(false);
@@ -114,7 +162,11 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
           <p className="text-gray-500 text-sm">{type}</p>
         </div>
 
-        <img src={image} alt="Car" className="w-full h-48 object-cover rounded-lg mb-4" />
+        <img
+          src={image}
+          alt="Car"
+          className="w-full h-48 object-cover rounded-lg mb-4"
+        />
 
         <div className="flex justify-around text-gray-500 text-sm mb-4">
           <div className="flex items-center gap-1">
@@ -154,7 +206,9 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
       {isOpen && (
         <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Detail Penyewaan</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-800">
+              Detail Penyewaan
+            </h2>
 
             {/* Phone Number */}
             <label className="block text-sm font-medium mb-1 text-gray-600">
