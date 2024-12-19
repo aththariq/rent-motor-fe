@@ -26,7 +26,7 @@ const Team = () => {
       github: "https://github.com/aththariq",
     },
     {
-      avatar: "https://randomuser.me/api/portraits/women/63.jpg",
+      avatar: "https://imgur.com/gzPRLy3.jpg",
       name: "Nasywaa Anggun",
       title: "Backend Developer",
       linkedin: "https://www.linkedin.com/in/nasywaa-anggun-athiefah/",
