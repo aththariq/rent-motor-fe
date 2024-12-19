@@ -7,7 +7,6 @@ const AdminPage = () => {
   const [error, setError] = useState(null); // Error message
   const [loading, setLoading] = useState(false); // Loading state
 
-  // Fetch orders from API
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -29,7 +28,7 @@ const AdminPage = () => {
       });
 
       console.log("API Response:", response.data);
-      setOrders(response.data.data.orders); // Correctly set orders
+      setOrders(response.data.data.orders); // Correctly access orders array
     } catch (err) {
       if (err.response?.status === 401) {
         console.error("Unauthorized: Token may be invalid or expired.");
@@ -42,14 +41,12 @@ const AdminPage = () => {
     }
   };
 
-  // Update order status
   const updateStatus = async (id, statusType, value) => {
     setLoading(true);
     try {
       let payload = {};
-      const now = new Date().toISOString();
+      const now = new Date().toISOString(); // Current date-time
 
-      // Add timestamp if status is updated
       if (statusType === "paymentStatus" && value === "complete") {
         payload.paymentDate = now;
       }
@@ -66,29 +63,15 @@ const AdminPage = () => {
         returnStatus: `/orders/${id}/returnedstatus`,
       };
 
-      const url = `https://api-motoran.faizath.com${endpointMap[statusType]}`;
-      console.log("Updating status at URL:", url);
-      console.log("Payload:", { [statusType]: value, ...payload });
-
-      await axios.put(
-        url,
-        { [statusType]: value, ...payload },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await axios.put(`https://api-motoran.faizath.com${endpointMap[statusType]}`, {
+        [statusType]: value,
+        ...payload,
+      });
 
       toast.success("Status berhasil diperbarui.");
-      fetchOrders(); // Refetch orders after update
+      fetchOrders();
     } catch (error) {
-      if (error.response) {
-        console.error("Error Response Data:", error.response.data);
-        console.error("Error Response Status:", error.response.status);
-      } else {
-        console.error("Error Message:", error.message);
-      }
+      console.error("Error updating status:", error);
       toast.error("Gagal memperbarui status.");
     } finally {
       setLoading(false);
@@ -106,7 +89,6 @@ const AdminPage = () => {
 
       {error && <div className="text-red-600">Error: {error}</div>}
 
-      {/* Orders Table */}
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -123,11 +105,8 @@ const AdminPage = () => {
               <tr key={`${order._id}-${statusIndex}`} className="hover:bg-gray-50">
                 <td className="border p-2">{index + 1}</td>
                 <td className="border p-2">{order.email}</td>
-
-                {/* Payment Status */}
                 <td className="border p-2">
                   <select
-                    key={`${order._id}-${status.paymentStatus}`}
                     value={status.paymentStatus}
                     onChange={(e) =>
                       updateStatus(order._id, "paymentStatus", e.target.value)
@@ -138,11 +117,8 @@ const AdminPage = () => {
                     <option value="complete">Complete</option>
                   </select>
                 </td>
-
-                {/* Taken Status */}
                 <td className="border p-2">
                   <select
-                    key={`${order._id}-${status.takenStatus}`}
                     value={status.takenStatus}
                     onChange={(e) =>
                       updateStatus(order._id, "takenStatus", e.target.value)
@@ -153,11 +129,8 @@ const AdminPage = () => {
                     <option value="taken">Taken</option>
                   </select>
                 </td>
-
-                {/* Return Status */}
                 <td className="border p-2">
                   <select
-                    key={`${order._id}-${status.returnStatus}`}
                     value={status.returnStatus}
                     onChange={(e) =>
                       updateStatus(order._id, "returnStatus", e.target.value)
