@@ -13,7 +13,7 @@ import {
   Spin,
 } from "antd";
 import { toast } from "sonner";
-import { QRCode } from "antd"; // Import Ant Design's QRCode component
+import { QRCode } from "antd"; 
 
 const { Title, Text } = Typography;
 
