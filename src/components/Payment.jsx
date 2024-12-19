@@ -38,11 +38,21 @@ const Payment = () => {
 
   useEffect(() => {
     if (!orderIdParam || !tokenParam) {
-      toast.error("Parameter orderId atau token tidak ditemukan.");
-      navigate("/");
-      return;
+      const fallbackOrderId = orderDataFromState?.orderId || null;
+      const fallbackToken = localStorage.getItem("token") || null;
+
+      if (!fallbackOrderId || !fallbackToken) {
+        toast.error("Parameter orderId atau token tidak ditemukan.");
+        navigate("/home");
+      }
     }
-  }, [orderIdParam, tokenParam, navigate]);
+  }, [orderIdParam, tokenParam, orderDataFromState, navigate]);
+
+  console.log("Query Parameters:");
+  console.log("orderIdParam:", orderIdParam);
+  console.log("tokenParam:", tokenParam);
+  console.log("Fallback Order ID:", orderDataFromState?.orderId || null);
+  console.log("Fallback Token:", localStorage.getItem("token") || null);
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -170,13 +180,9 @@ const Payment = () => {
     (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
   );
 
-  const qrPaymentUrl = orderIdParam
-    ? `${window.location.origin}/payment?orderId=${orderIdParam}&token=${tokenParam}`
-    : orderDataFromState
-    ? `${window.location.origin}/payment?orderId=${
-        orderDataFromState.orderId
-      }&token=${localStorage.getItem("token")}`
-    : "";
+  const qrPaymentUrl = `${window.location.origin}/payment?orderId=${
+    orderIdParam || orderDataFromState?.orderId
+  }&token=${tokenParam || localStorage.getItem("token")}`;
 
   return (
     <div style={{ padding: "24px", background: "#f0f2f5", minHeight: "100vh" }}>
