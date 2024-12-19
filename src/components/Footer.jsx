@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <div>
       <motion.footer
-        className="bg-gray-100"
+        className="bg-blue-950"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -17,7 +17,7 @@ const Footer = () => {
             <img src={logo} alt="Motoran Logo" className="h-16 w-16" />
           </div>
 
-          <p className="mx-auto mt-6 max-w-md text-center leading-relaxed text-gray-500">
+          <p className="mx-auto mt-6 max-w-md text-center leading-relaxed text-white">
             Kami hadir dengan solusi digital yang menyederhanakan setiap langkah
             dalam layanan sewa motor. Nikmati perjalanan lebih cepat, praktis,
             dan produktif bersama kami.
@@ -26,7 +26,7 @@ const Footer = () => {
           <ul className="mt-12 flex flex-wrap justify-center gap-6 md:gap-8 lg:gap-12">
             <li>
               <a
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
                 href="#"
               >
                 {" "}
@@ -36,7 +36,7 @@ const Footer = () => {
 
             <li>
               <a
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
                 href="#"
               >
                 {" "}
@@ -46,7 +46,7 @@ const Footer = () => {
 
             <li>
               <a
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
                 href="#"
               >
                 {" "}
@@ -56,7 +56,7 @@ const Footer = () => {
 
             <li>
               <a
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
                 href="#"
               >
                 {" "}
@@ -66,7 +66,7 @@ const Footer = () => {
 
             <li>
               <a
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
                 href="#"
               >
                 {" "}
@@ -81,7 +81,7 @@ const Footer = () => {
                 href="https://github.com/aththariq/rent-motor-fe"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
               >
                 <span className="sr-only">Facebook</span>
                 <svg
@@ -104,7 +104,7 @@ const Footer = () => {
                 href="https://github.com/aththariq/rent-motor-fe"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
               >
                 <span className="sr-only">Instagram</span>
                 <svg
@@ -127,7 +127,7 @@ const Footer = () => {
                 href="https://github.com/aththariq/rent-motor-fe"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
               >
                 <span className="sr-only">Twitter</span>
                 <svg
@@ -146,7 +146,7 @@ const Footer = () => {
                 href="https://github.com/aththariq/rent-motor-fe"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:text-gray-700/75"
+                className="text-white transition hover:text-gray-700/75"
               >
                 <span className="sr-only">GitHub</span>
                 <svg

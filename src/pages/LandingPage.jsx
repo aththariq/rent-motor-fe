@@ -5,6 +5,7 @@ import WhatWeOffer from "../components/WhatWeOffer";
 import FaQ from "../components/FaQ";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import Team from "@/components/Team";
 
 const LandingPage = () => {
   return (
@@ -15,6 +16,7 @@ const LandingPage = () => {
       <WhatWeOffer />
       <Testimonials />
       <FaQ />
+      <Team />
       <Footer />
     </div>
   );
