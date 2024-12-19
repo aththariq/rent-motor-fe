@@ -53,27 +53,17 @@ const CardMotor = ({ name, type, image, fuel, transmission, capacity, price, ava
         return;
       }
   
-      // Construct order data
-      const orderData = {
-        email: email, // Use the retrieved email
-        orderStatus: [
-          {
-            phoneNumber: customer.phone,
-            idCard: customer.uploadedImage?.name || "No Image",
-            orderDate: new Date().toISOString(),
-            takenDate: customer.startDate?.toISOString(),
-            returnDate: customer.endDate?.toISOString(),
-            paymentStatus: "uncomplete",
-            takenStatus: "untaken",
-            returnStatus: "unreturned",
-          },
-        ],
-      };
+      const formData = new FormData();
+      formData.append("phone", customer.phone);
+      formData.append("startDate", customer.startDate);
+      formData.append("endDate", customer.endDate);
+      formData.append("ktpImage", customer.uploadedImage);
+  
   
       // Send API request
-      const response = await axios.post("https://api-motoran.faizath.com/orders", orderData, {
+      const response = await axios.post("https://api-motoran.faizath.com/orders", formData, {
         headers: {
-          Authorization: `Bearer ${token}`, // Include Bearer token
+          Authorization: `Bearer ${token}`, 
           "Content-Type": "application/json",
         },
       });
