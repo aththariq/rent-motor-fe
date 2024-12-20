@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { DatePicker, Input, Upload, Space } from "antd"; // Updated imports
 import { InboxOutlined } from "@ant-design/icons"; // New import for Upload
 import moment from "moment";
+import { toast } from "sonner";
+import imageCompression from "browser-image-compression";
 
 const { RangePicker } = DatePicker;
 
@@ -42,15 +44,32 @@ const CardMotor = ({
     setCustomer({ ...customer, [name]: value });
   };
 
-  const handleImageUpload = (info) => {
+  const handleImageUpload = async (info) => {
     const { file } = info;
-    const uploadedFile = file.originFileObj || file; // Antisipasi kasus tanpa originFileObj
+    const uploadedFile = file.originFileObj || file;
+  
     if (uploadedFile) {
-      console.log("Uploaded File:", uploadedFile);
-      setCustomer({ ...customer, uploadedImage: uploadedFile });
-      setImagePreview(URL.createObjectURL(uploadedFile));
+      try {
+        // Compression options
+        const options = {
+          maxSizeMB: 1, // Compress to 1MB
+          maxWidthOrHeight: 1024, // Resize image to max 1024px
+          useWebWorker: true,
+        };
+  
+        const compressedFile = await imageCompression(uploadedFile, options);
+  
+        console.log("Original file size:", uploadedFile.size / 1024 / 1024, "MB");
+        console.log("Compressed file size:", compressedFile.size / 1024 / 1024, "MB");
+  
+        setCustomer({ ...customer, uploadedImage: compressedFile });
+        setImagePreview(URL.createObjectURL(compressedFile));
+      } catch (error) {
+        console.error("Image compression failed:", error);
+        toast.error("Gagal mengompresi gambar. Silakan coba file lain.");
+      }
     } else {
-      console.error("File upload failed or is not accessible");
+      toast.error("File upload failed or is not accessible");
     }
   };
 
@@ -72,43 +91,41 @@ const CardMotor = ({
 
   const handleConfirm = async () => {
     setLoading(true);
-    setAlert({ type: "", message: "", description: "" }); // Reset alert
+    setAlert({ type: "", message: "", description: "" });
+  
     try {
       const token = localStorage.getItem("token");
-      const email = localStorage.getItem("email");
-
-      if (!token || !email) {
-        setAlert({
-          type: "error",
-          message: "Akun Anda tidak valid",
-          description: "Silakan login kembali.",
-        });
-        return;
+      if (!token) {
+        throw new Error("Token is missing. Please log in again.");
       }
-
+  
       const { phone, startDate, endDate, uploadedImage } = customer;
-
-      if (typeof phone !== "string" || phone.trim() === "") {
+  
+      // Validate input fields
+      if (!phone || phone.trim() === "") {
         throw new Error("Nomor telepon harus diisi dengan benar.");
       }
       if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
         throw new Error("Tanggal sewa harus dipilih dengan benar.");
       }
-      if (!uploadedImage || !(uploadedImage instanceof Blob)) {
+      if (!uploadedImage) {
         throw new Error("Gambar KTP harus diunggah.");
       }
-
-      const formattedStartDate = startDate.toISOString();
-      const formattedEndDate = endDate.toISOString();
-
+  
+      // Prepare FormData
       const formData = new FormData();
-      formData.append("phone", phone);
-      formData.append("startDate", formattedStartDate);
-      formData.append("endDate", formattedEndDate);
-      formData.append("ktpImage", uploadedImage);
-
-      console.log("Sending data:", Array.from(formData.entries()));
-
+      formData.append("email", localStorage.getItem("email"));
+      formData.append("orderStatus[0][phoneNumber]", phone);
+      formData.append("orderStatus[0][idCard]", uploadedImage);
+      formData.append("orderStatus[0][orderDate]", new Date().toISOString());
+      formData.append("orderStatus[0][takenDate]", startDate.toISOString());
+      formData.append("orderStatus[0][returnDate]", endDate.toISOString());
+      formData.append("orderStatus[0][paymentStatus]", "uncomplete");
+      formData.append("orderStatus[0][takenStatus]", "untaken");
+      formData.append("orderStatus[0][returnStatus]", "unreturned");
+  
+      console.log("FormData entries:", Array.from(formData.entries()));
+  
       const response = await axios.post(
         "https://api-motoran.faizath.com/orders",
         formData,
@@ -119,57 +136,47 @@ const CardMotor = ({
           },
         }
       );
-
-      console.log("Response Status:", response.status);
-      console.log("Response Data:", response.data);
-
-      // Validasi respons sukses berdasarkan status HTTP dan pesan respons
-      if (
-        (response.status === 200 || response.status === 201) &&
-        response.data.status === "success"
-      ) {
-        console.log("API Response:", response.data);
+  
+      if (response.status === 200 || response.status === 201) {
         setAlert({
           type: "success",
           message: "Order berhasil dibuat.",
-          description:
-            response.data.message || "Pesanan Anda telah berhasil dibuat.",
+          description: "Pesanan Anda telah berhasil dibuat.",
         });
         setIsOpen(false);
-
-        // Navigasi ke halaman payment dengan menyertakan orderId dan token di URL
-        const orderId = response.data.data.orderId; // Pastikan orderId tersedia di respons backend
-        const token = localStorage.getItem("token");
-
-        if (orderId && token) {
+  
+        const orderId = response.data?.data?.orderId;
+        if (orderId) {
           navigate(`/payment?orderId=${orderId}&token=${token}`);
         } else {
-          setAlert({
-            type: "error",
-            message: "Gagal mendapatkan informasi order.",
-            description: "Silakan coba lagi atau hubungi support.",
-          });
+          throw new Error("Gagal mendapatkan informasi order.");
         }
       } else {
-        setAlert({
-          type: "error",
-          message: "Gagal Membuat Order",
-          description: response.data.message || "Terjadi kesalahan.",
-        });
+        throw new Error(response.data.message || "Gagal Membuat Order.");
       }
     } catch (error) {
-      console.error("Error:", error);
-      setAlert({
-        type: "error",
-        message: "Terjadi Kesalahan",
-        description:
-          error.response?.data?.message ||
-          "Terjadi kesalahan saat membuat order.",
-      });
+      console.error("Error:", error.response?.data || error.message);
+  
+      if (error.response) {
+        const status = error.response.status;
+  
+        if (status === 401) {
+          toast.error("Unauthorized: Please log in again.");
+          navigate("/login");
+        } else if (status === 500) {
+          toast.error("Server error: Please try again later.");
+        } else {
+          toast.error(error.response?.data?.message || "Terjadi kesalahan.");
+        }
+      } else {
+        toast.error("Network error: Please check your connection.");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  };    
+  
+  
 
   const onClose = () => {
     setIsOpen(false);

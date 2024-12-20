@@ -7,31 +7,32 @@ const AdminPage = () => {
   const [error, setError] = useState(null); // Error message
   const [loading, setLoading] = useState(false); // Loading state
 
+  // Fetch orders from backend
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("Retrieved Token:", token);
-
       if (!token) {
-        console.error("Token not found. Redirecting to login.");
         window.location.href = "/login"; // Redirect if no token
         return;
       }
 
       const url = "https://api-motoran.faizath.com/orders";
-      console.log("Fetching orders from:", url);
-
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log("API Response:", response.data);
-      setOrders(response.data.data.orders); // Correctly access orders array
+      console.log("API Response Data:", response.data);
+
+      if (response.data && response.data.data && response.data.data.orders) {
+        setOrders(response.data.data.orders);
+      } else {
+        console.error("Unexpected API response structure:", response.data);
+        setOrders([]); // Fallback to empty array
+      }
     } catch (err) {
       if (err.response?.status === 401) {
-        console.error("Unauthorized: Token may be invalid or expired.");
         localStorage.removeItem("token");
         window.location.href = "/login"; // Redirect to login
         return;
@@ -41,38 +42,72 @@ const AdminPage = () => {
     }
   };
 
-  const updateStatus = async (id, statusType, value) => {
+  // Update status for a specific order
+  const updateStatus = async (orderId, statusType, value, statusId) => {
     setLoading(true);
     try {
-      let payload = {};
       const now = new Date().toISOString(); // Current date-time
 
+      // Map endpoint based on status type
+      const endpointMap = {
+        paymentStatus: `/orders/${orderId}/paidstatus`,
+        takenStatus: `/orders/${orderId}/takenstatus`,
+        returnStatus: `/orders/${orderId}/returnedstatus`,
+      };
+
+      const url = `https://api-motoran.faizath.com${endpointMap[statusType]}`;
+
+      // Prepare payload
+      const payload = {
+        [statusType]: value,
+      };
+
+      // Add timestamp if required
       if (statusType === "paymentStatus" && value === "complete") {
         payload.paymentDate = now;
-      }
-      if (statusType === "takenStatus" && value === "taken") {
+      } else if (statusType === "takenStatus" && value === "taken") {
         payload.takenDate = now;
-      }
-      if (statusType === "returnStatus" && value === "returned") {
+      } else if (statusType === "returnStatus" && value === "returned") {
         payload.returnDate = now;
       }
 
-      const endpointMap = {
-        paymentStatus: `/orders/${id}/paidstatus`,
-        takenStatus: `/orders/${id}/takenstatus`,
-        returnStatus: `/orders/${id}/returnedstatus`,
-      };
+      console.log("Calling endpoint:", url);
+      console.log("Payload:", payload);
 
-      await axios.put(`https://api-motoran.faizath.com${endpointMap[statusType]}`, {
-        [statusType]: value,
-        ...payload,
+      // Send PUT request to backend
+      // Setelah PUT berhasil
+      const response = await axios.put(url, payload, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      toast.success("Status berhasil diperbarui.");
+      // Perbarui state lokal atau fetch ulang data
       fetchOrders();
+      toast.success("Status successfully updated.");
+
+
+      console.log("Update response:", response.data);
+
+
+      // Update the state locally to reflect the changes
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId
+            ? {
+                ...order,
+                orderStatus: order.orderStatus.map((status) =>
+                  status._id === statusId
+                    ? { ...status, [statusType]: value }
+                    : status
+                ),
+              }
+            : order
+        )
+      );
+
+      toast.success("Status successfully updated.");
     } catch (error) {
       console.error("Error updating status:", error);
-      toast.error("Gagal memperbarui status.");
+      toast.error("Failed to update status.");
     } finally {
       setLoading(false);
     }
@@ -86,13 +121,12 @@ const AdminPage = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Admin - Manage Orders</h1>
       {loading && <p className="text-gray-600">Updating status...</p>}
-
       {error && <div className="text-red-600">Error: {error}</div>}
 
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border p-2">No</th>
+            <th className="border p-2">Order ID</th>
             <th className="border p-2">Email</th>
             <th className="border p-2">Payment Status</th>
             <th className="border p-2">Taken Status</th>
@@ -100,16 +134,19 @@ const AdminPage = () => {
           </tr>
         </thead>
         <tbody>
-          {orders.map((order, index) =>
-            order.orderStatus.map((status, statusIndex) => (
-              <tr key={`${order._id}-${statusIndex}`} className="hover:bg-gray-50">
-                <td className="border p-2">{index + 1}</td>
-                <td className="border p-2">{order.email}</td>
+          {orders.map((order) =>
+            order.orderStatus.map((status) => (
+              <tr
+                key={`${order._id}-${status._id}`} // Use status ID for uniqueness
+                className="hover:bg-gray-50"
+              >
+                <td className="border p-2">{status._id}</td>
+                <td className="border p-2">{order.email || "N/A"}</td>
                 <td className="border p-2">
                   <select
-                    value={status.paymentStatus}
+                    value={status.paymentStatus || "uncomplete"}
                     onChange={(e) =>
-                      updateStatus(order._id, "paymentStatus", e.target.value)
+                      updateStatus(order._id, "paymentStatus", e.target.value, status._id)
                     }
                     className="border p-1 rounded"
                   >
@@ -119,9 +156,9 @@ const AdminPage = () => {
                 </td>
                 <td className="border p-2">
                   <select
-                    value={status.takenStatus}
+                    value={status.takenStatus || "untaken"}
                     onChange={(e) =>
-                      updateStatus(order._id, "takenStatus", e.target.value)
+                      updateStatus(order._id, "takenStatus", e.target.value, status._id)
                     }
                     className="border p-1 rounded"
                   >
@@ -131,9 +168,9 @@ const AdminPage = () => {
                 </td>
                 <td className="border p-2">
                   <select
-                    value={status.returnStatus}
+                    value={status.returnStatus || "unreturned"}
                     onChange={(e) =>
-                      updateStatus(order._id, "returnStatus", e.target.value)
+                      updateStatus(order._id, "returnStatus", e.target.value, status._id)
                     }
                     className="border p-1 rounded"
                   >
