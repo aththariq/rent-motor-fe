@@ -13,9 +13,8 @@ const Payment = () => {
   const query = new URLSearchParams(location.search);
   const orderIdParam = query.get("orderId");
   const tokenParam = query.get("token");
-  const { order, motor } = location.state || {}; // Destructure order and motor from state
 
-  const [orderData, setOrderData] = useState(order || null);
+  const [orderData, setOrderData] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState("");
@@ -37,42 +36,49 @@ const Payment = () => {
 
   useEffect(() => {
     if (!orderIdParam || !tokenParam) {
-      const fallbackOrderId = order?.orderId || null;
-      const fallbackToken = localStorage.getItem("token") || null;
+      const fallbackOrderId = orderIdParam;
+      const fallbackToken = tokenParam || localStorage.getItem("token") || null;
 
       if (!fallbackOrderId || !fallbackToken) {
         toast.error("Parameter orderId atau token tidak ditemukan.");
         navigate("/home");
       }
     }
-  }, [orderIdParam, tokenParam, order, navigate]);
+
+    // Fetch order data from backend
+    if (orderIdParam) {
+      axios.get(`https://api-motoran.faizath.com/orders/${orderIdParam}`, {
+        headers: {
+          Authorization: `Bearer ${tokenParam || localStorage.getItem("token")}`,
+        },
+      })
+      .then(response => {
+        const fetchedOrder = response.data;
+        setOrderData(fetchedOrder);
+        setQrUrl(`https://yourfrontend.com/payment?orderId=${orderIdParam}`);
+
+        // Hitung total harga
+        const rentalDays = Math.ceil(
+          (new Date(fetchedOrder.returnDate) - new Date(fetchedOrder.takenDate)) /
+            (1000 * 60 * 60 * 24)
+        );
+        const total = rentalDays * fetchedOrder.motor.price; // Adjust based on fetched data
+        setTotalPrice(total);
+      })
+      .catch(error => {
+        toast.error("Gagal mengambil data pesanan.");
+        navigate("/home");
+      });
+    }
+  }, [orderIdParam, tokenParam, navigate]);
 
   console.log("Query Parameters:");
   console.log("orderIdParam:", orderIdParam);
   console.log("tokenParam:", tokenParam);
-  console.log("Order Data:", order);
-  console.log("Motor Data:", motor);
+  console.log("Order Data:", orderData);
   console.log("Fallback Token:", localStorage.getItem("token") || null);
 
-  useEffect(() => {
-    if (order && motor) { 
-      setOrderData(order);
-      setQrUrl(`https://api-motoran.faizath.com/orders/${order.orderId}`);
-
-      // Hitung total harga
-      const rentalDays = Math.ceil(
-        (new Date(order.returnDate) - new Date(order.takenDate)) /
-          (1000 * 60 * 60 * 24)
-      );
-      const total = rentalDays * motor.price; 
-      setTotalPrice(total);
-    } else {
-      toast.error("Data pesanan atau motor tidak ditemukan.");
-      navigate("/home");
-    }
-  }, [order, motor, navigate]);
-
-  if (!orderData || !motor) {
+  if (!orderData) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -80,7 +86,7 @@ const Payment = () => {
     );
   }
 
-  const { phoneNumber, takenDate, returnDate } = orderData;
+  const { phoneNumber, takenDate, returnDate, motor } = orderData;
 
   const rentalDays = Math.ceil(
     (new Date(returnDate) - new Date(takenDate)) / (1000 * 60 * 60 * 24)
