@@ -13,16 +13,15 @@ const Payment = () => {
   const query = new URLSearchParams(location.search);
   const orderIdParam = query.get("orderId");
   const tokenParam = query.get("token");
-  const orderDataFromState = location.state;
+  const { order, motor } = location.state || {}; // Destructure order and motor from state
 
-  const [orderData, setOrderData] = useState(orderDataFromState || null);
+  const [orderData, setOrderData] = useState(order || null);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState("");
 
   const [isMobile, setIsMobile] = useState(false);
+  const [qrUrl, setQrUrl] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -38,7 +37,7 @@ const Payment = () => {
 
   useEffect(() => {
     if (!orderIdParam || !tokenParam) {
-      const fallbackOrderId = orderDataFromState?.orderId || null;
+      const fallbackOrderId = order?.orderId || null;
       const fallbackToken = localStorage.getItem("token") || null;
 
       if (!fallbackOrderId || !fallbackToken) {
@@ -46,126 +45,34 @@ const Payment = () => {
         navigate("/home");
       }
     }
-  }, [orderIdParam, tokenParam, orderDataFromState, navigate]);
+  }, [orderIdParam, tokenParam, order, navigate]);
 
   console.log("Query Parameters:");
   console.log("orderIdParam:", orderIdParam);
   console.log("tokenParam:", tokenParam);
-  console.log("Fallback Order ID:", orderDataFromState?.orderId || null);
+  console.log("Order Data:", order);
+  console.log("Motor Data:", motor);
   console.log("Fallback Token:", localStorage.getItem("token") || null);
 
   useEffect(() => {
-    const fetchOrderData = async () => {
-      if (orderDataFromState) {
-        const { customer, motor } = orderDataFromState;
-        const rentalDays = Math.ceil(
-          (new Date(customer.endDate) - new Date(customer.startDate)) /
-            (1000 * 60 * 60 * 24)
-        );
-        const total = rentalDays * motor.price;
-        setTotalPrice(total);
-      } else if (orderIdParam && tokenParam) {
-        setFetching(true);
-        try {
-          const response = await axios.get(
-            `https://api-motoran.faizath.com/orders/${orderIdParam}`,
-            {
-              headers: {
-                Authorization: `Bearer ${tokenParam}`,
-              },
-            }
-          );
+    if (order && motor) { // Ensure both order and motor exist
+      setOrderData(order);
+      setQrUrl(`https://api-motoran.faizath.com/orders/${order.orderId}`);
 
-          if (response.status === 200) {
-            setOrderData(response.data);
-            const { customer, motor } = response.data;
-            const rentalDays = Math.ceil(
-              (new Date(customer.endDate) - new Date(customer.startDate)) /
-                (1000 * 60 * 60 * 24)
-            );
-            const total = rentalDays * motor.price;
-            setTotalPrice(total);
-          } else {
-            toast.error(response.data.message || "Gagal mengambil data order.");
-            navigate("/home");
-          }
-        } catch (error) {
-          console.error("Error fetching order data:", error);
-          toast.error(
-            error.response?.data?.message ||
-              "Terjadi kesalahan saat mengambil data order."
-          );
-          navigate("/home");
-        } finally {
-          setFetching(false);
-        }
-      } else {
-        toast.error("Data pesanan tidak ditemukan.");
-        navigate("/home");
-      }
-    };
-
-    fetchOrderData();
-  }, [orderDataFromState, orderIdParam, tokenParam, navigate]);
-
-  const handlePayment = async () => {
-    setLoading(true);
-    setPaymentError("");
-    try {
-      const token = localStorage.getItem("token");
-      const email = localStorage.getItem("email");
-
-      if (!token || !email) {
-        toast.error("Akun Anda tidak valid. Silakan login kembali.");
-        navigate("/login");
-        return;
-      }
-
-      const { phone, startDate, endDate, uploadedImage } = orderData.customer;
-      const { motor } = orderData;
-
-      const formData = new FormData();
-      formData.append("phone", phone);
-      formData.append("startDate", new Date(startDate).toISOString());
-      formData.append("endDate", new Date(endDate).toISOString());
-      formData.append("ktpImage", uploadedImage);
-      formData.append("motorId", motor.id);
-
-      const response = await axios.post(
-        "https://api-motoran.faizath.com/orders",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      // Hitung total harga
+      const rentalDays = Math.ceil(
+        (new Date(order.returnDate) - new Date(order.takenDate)) /
+          (1000 * 60 * 60 * 24)
       );
-
-      if (response.status === 201) {
-        const orderId = response.data.data.orderId; // Pastikan orderId tersedia di respons backend
-        const token = localStorage.getItem("token");
-
-        navigate(`/payment?orderId=${orderId}&token=${token}`);
-      } else {
-        console.error("Gagal membuat order:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      if (error.response?.status === 401) {
-        toast.error("Unauthorized: Silakan login kembali.");
-        localStorage.removeItem("token");
-        localStorage.removeItem("email");
-        navigate("/login");
-      } else {
-        setPaymentError(error.response?.data?.message || ".");
-      }
-    } finally {
-      setLoading(false);
+      const total = rentalDays * motor.price; // Use motor.price from passed motor data
+      setTotalPrice(total);
+    } else {
+      toast.error("Data pesanan atau motor tidak ditemukan.");
+      navigate("/home");
     }
-  };
+  }, [order, motor, navigate]);
 
-  if (fetching) {
+  if (!orderData || !motor) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -173,19 +80,13 @@ const Payment = () => {
     );
   }
 
-  if (!orderData) {
-    return null;
-  }
+  const { phoneNumber, takenDate, returnDate } = orderData;
 
-  const { motor, customer } = orderData;
-  const { startDate, endDate } = customer;
   const rentalDays = Math.ceil(
-    (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
+    (new Date(returnDate) - new Date(takenDate)) / (1000 * 60 * 60 * 24)
   );
 
-  const qrPaymentUrl = `${window.location.origin}/payment?orderId=${
-    orderIdParam || orderDataFromState?.orderId
-  }&token=${tokenParam || localStorage.getItem("token")}`;
+  const qrPaymentUrl = qrUrl;
 
   return (
     <div style={{ padding: "24px", background: "#f0f2f5", minHeight: "100vh" }}>
@@ -260,14 +161,14 @@ const Payment = () => {
                 <Col span={12}>
                   <Text strong>Nomor Telepon:</Text>
                   <br />
-                  <Text>{customer.phone}</Text>
+                  <Text>{phoneNumber}</Text>
                 </Col>
                 <Col span={12}>
                   <Text strong>Tanggal Sewa:</Text>
                   <br />
                   <Text>
-                    {new Date(startDate).toLocaleDateString()} -{" "}
-                    {new Date(endDate).toLocaleDateString()}
+                    {new Date(takenDate).toLocaleDateString()} -{" "}
+                    {new Date(returnDate).toLocaleDateString()}
                   </Text>
                 </Col>
                 <Col span={12}>
@@ -300,11 +201,10 @@ const Payment = () => {
               <Button
                 type="primary"
                 size="large"
-                onClick={handlePayment}
-                loading={loading}
+                onClick={() => (window.location.href = qrPaymentUrl)} // Redirect ke URL pembayaran
                 block
               >
-                {loading ? "Memproses..." : "Bayar Sekarang"}
+                Bayar Sekarang
               </Button>
             </div>
 
@@ -320,8 +220,8 @@ const Payment = () => {
                   <Spin />
                 )}
               </div>
-              <div></div>
             </div>
+
             <Button
               type="default"
               size="large"

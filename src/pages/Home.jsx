@@ -12,6 +12,7 @@ const Home = () => {
   useEffect(() => {
     axios.get('https://api-motoran.faizath.com/inventories')
       .then(response => {
+        console.log("Full Response Data:", response.data);
         setMotorData(response.data.data.inventories);
       })
       .catch(error => {

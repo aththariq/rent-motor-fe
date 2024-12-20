@@ -84,6 +84,7 @@ const CardMotor = ({
           message: "Akun Anda tidak valid",
           description: "Silakan login kembali.",
         });
+        navigate("/login"); // Redirect to login
         return;
       }
 
@@ -121,7 +122,7 @@ const CardMotor = ({
           },
         }
       );
-
+      console.log("Full Response Data:", response.data);
       console.log("Response Status:", response.status);
       console.log("Response Data:", response.data);
 
@@ -139,12 +140,14 @@ const CardMotor = ({
         });
         setIsOpen(false);
 
-      
-        const orderId = response.data.data.order._id; 
+        const order = response.data.data.order; // Get the order object
+        const orderId = order._id; 
         const token = localStorage.getItem("token");
 
         if (orderId && token) {
-          navigate(`/payment?orderId=${orderId}&token=${token}`);
+          navigate(`/payment?orderId=${orderId}&token=${token}`, { 
+            state: { order, motor: { _id, name, type, image, fuel, transmission, capacity, price, available } } 
+          }); // Pass both order and motor data via state
         } else {
           setAlert({
             type: "error",
@@ -163,13 +166,22 @@ const CardMotor = ({
       }
     } catch (error) {
       console.error("Error:", error);
-      setAlert({
-        type: "error",
-        message: "Terjadi Kesalahan",
-        description:
-          error.response?.data?.message ||
-          "Terjadi kesalahan saat membuat order.",
-      });
+      if (error.response && error.response.status === 401) {
+        setAlert({
+          type: "error",
+          message: "Unauthorized: Invalid Authentication.",
+          description: "Silakan login kembali.",
+        });
+        navigate("/login"); // Redirect to login on 401
+      } else {
+        setAlert({
+          type: "error",
+          message: "Terjadi Kesalahan",
+          description:
+            error.response?.data?.message ||
+            "Terjadi kesalahan saat membuat order.",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -293,7 +305,6 @@ const CardMotor = ({
             <Upload.Dragger
               name="ktpImage"
               multiple={false}
-              action="https://api-motoran.faizath.com/orders"
               onChange={handleImageUpload}
               beforeUpload={() => false} 
               className="mb-4"
