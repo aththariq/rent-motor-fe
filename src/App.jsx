@@ -7,7 +7,7 @@ import Cards from "./pages/ProductCard"
 import Home from "./pages/Home";
 import Admin from "./pages/AdminPage"
 import NotFoundPage from "./pages/NotFoundPage";
-import Payment from "./components/Payment";
+import Payment from "./components/Payment"; // Import Payment component
 
 function App() {
   return (
@@ -21,7 +21,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFoundPage />} />
-        <Route path="/payment" element={<Payment />} />
+        <Route path="/payment" element={<Payment />} /> {/* Added payment route */}
       </Routes>
     </Router>
   );

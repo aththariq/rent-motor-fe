@@ -47,13 +47,11 @@ const Payment = () => {
     }
 
     // Fetch order data from backend
-    if (orderIdParam) {
+    if (orderIdParam && tokenParam) { // Ensure both orderId and token are present
       axios
         .get(`https://api-motoran.faizath.com/orders/${orderIdParam}`, {
           headers: {
-            Authorization: `Bearer ${
-              tokenParam || localStorage.getItem("token")
-            }`,
+            Authorization: `Bearer ${tokenParam || localStorage.getItem("token")}`,
           },
         })
         .then((response) => {
