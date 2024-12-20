@@ -1,4 +1,3 @@
-
 {
   "rewrites": [
     { "source": "/payment/:path*", "destination": "/payment" },

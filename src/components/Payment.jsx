@@ -121,8 +121,16 @@ const Payment = () => {
     setPaymentLoading(true);
     setPaymentError("");
     try {
+      console.log("Order Data:", orderData); // Log orderData
       const paymentEndpoint = `https://api-motoran.faizath.com/payment/${orderData._id}/pay`;
+      console.log("Payment Endpoint:", paymentEndpoint); // Log paymentEndpoint
+
       const token = tokenParam || localStorage.getItem("token");
+      console.log("Token:", token); // Log token
+
+      if (!orderData._id) {
+        throw new Error("Order ID is undefined.");
+      }
 
       const response = await axios.post(
         paymentEndpoint,
@@ -134,6 +142,8 @@ const Payment = () => {
         }
       );
 
+      console.log("Payment Response:", response); // Log full response
+
       if (response.status === 200 && response.data.status === "success") {
         setPaymentSuccess(true);
         toast.success("Pembayaran berhasil dilakukan.");
@@ -142,6 +152,10 @@ const Payment = () => {
       }
     } catch (error) {
       console.error("Payment Error:", error);
+      if (error.response) {
+        console.error("Error Response Data:", error.response.data); // Log error response data
+        console.error("Error Response Status:", error.response.status); // Log error response status
+      }
       setPaymentError(error.response?.data?.message || "Pembayaran gagal.");
       toast.error("Pembayaran gagal.");
     } finally {
