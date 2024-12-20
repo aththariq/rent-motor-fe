@@ -47,11 +47,14 @@ const Payment = () => {
     }
 
     // Fetch order data from backend
-    if (orderIdParam && tokenParam) { // Ensure both orderId and token are present
+    if (orderIdParam && tokenParam) {
+      // Ensure both orderId and token are present
       axios
         .get(`https://api-motoran.faizath.com/orders/${orderIdParam}`, {
           headers: {
-            Authorization: `Bearer ${tokenParam || localStorage.getItem("token")}`,
+            Authorization: `Bearer ${
+              tokenParam || localStorage.getItem("token")
+            }`,
           },
         })
         .then((response) => {
@@ -67,56 +70,50 @@ const Payment = () => {
             axios
               .get("https://api-motoran.faizath.com/inventories", {
                 headers: {
-                (motor) => motor._id === fetchedOrder.motorId
-              );
+                  Authorization: `Bearer ${
+                    tokenParam || localStorage.getItem("token")
+                  }`,
+                },
+              })
+              .then((motorResponse) => {
+                const motors = motorResponse.data.data.inventories;
+                const fetchedMotor = motors.find(
+                  (motor) => motor._id === fetchedOrder.motorId
+                ); // Moved .find() outside headers
 
-              if (fetchedMotor) {
-                setMotorData(fetchedMotor);
-                const rentalDays = calculateRentalDays(fetchedOrder);
-                setTotalPrice(rentalDays * fetchedMotor.price);
-              } else {
-                toast.error("Data motor tidak ditemukan.");
+                if (fetchedMotor) {
+                  setMotorData(fetchedMotor);
+
+                  // Hitung total harga
+                  const rentalDays = Math.ceil(
+                    (new Date(fetchedOrder.returnDate) -
+                      new Date(fetchedOrder.takenDate)) /
+                      (1000 * 60 * 60 * 24)
+                  );
+                  const total = rentalDays * fetchedMotor.price; // Use motor.price from fetched data
+                  setTotalPrice(total);
+                } else {
+                  toast.error("Data motor tidak ditemukan.");
+                  navigate("/home");
+                }
+              })
+              .catch((motorError) => {
+                console.error(motorError);
+                toast.error("Gagal mengambil data motor.");
                 navigate("/home");
-              }
-            })
-            .catch((motorError) => {
-              console.error(motorError);
-              toast.error("Gagal mengambil data motor.");
-              navigate("/home");
-            });
-        } else {
-          toast.error("Data motorId tidak ditemukan.");
+              });
+          } else {
+            toast.error("Data motorId tidak ditemukan.");
+            navigate("/home");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error("Gagal mengambil data pesanan.");
           navigate("/home");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Gagal mengambil data pesanan.");
-        navigate("/home");
-      });
+        });
+    }
   }, [orderIdParam, tokenParam, navigate]);
-
-  console.log("Query Parameters:");
-  console.log("orderIdParam:", orderIdParam);
-  console.log("tokenParam:", tokenParam);
-  console.log("Order Data:", orderData);
-  console.log("Fallback Token:", localStorage.getItem("token") || null);
-
-  // Update rendering to use motorData instead of motor
-  if (!orderData || !motorData) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  const { phoneNumber, takenDate, returnDate } = orderData;
-
-  const rentalDays = Math.ceil(
-    (new Date(returnDate) - new Date(takenDate)) / (1000 * 60 * 60 * 24)
-  );
-
 
   console.log("Query Parameters:");
   console.log("orderIdParam:", orderIdParam);
@@ -157,7 +154,6 @@ const Payment = () => {
               style={{ marginBottom: "20px" }}
             />
           )}
-
           {/* Alert Error */}
           {paymentError && (
             <Alert
@@ -170,12 +166,10 @@ const Payment = () => {
               style={{ marginBottom: "20px" }}
             />
           )}
-
           <Card bordered={false} style={{ borderRadius: "8px" }}>
             <Title level={2} style={{ textAlign: "center" }}>
               Rangkuman Pembayaran
             </Title>
-
             {/* Detail Motor */}
             <Card
               type="inner"
@@ -215,7 +209,6 @@ const Payment = () => {
                 )}
               </Row>
             </Card>
-
             {/* Detail Sewa */}
             <Card
               type="inner"
@@ -244,7 +237,6 @@ const Payment = () => {
                 </Col>
               </Row>
             </Card>
-
             {/* Total Harga */}
             <Card
               type="inner"
@@ -261,7 +253,6 @@ const Payment = () => {
                 </Col>
               </Row>
             </Card>
-
             {/* Tombol "Bayar Sekarang" hanya di mobile */}
             <div className="block md:hidden">
               <Button
@@ -273,7 +264,6 @@ const Payment = () => {
                 Bayar Sekarang
               </Button>
             </div>
-
             {/* QR Code hanya di desktop */}
             <div className="hidden md:block">
               <Title level={4} style={{ textAlign: "center" }}>
@@ -283,7 +273,22 @@ const Payment = () => {
                 {qrPaymentUrl ? (
                   <QRCode value={qrPaymentUrl} size={200} />
                 ) : (
-                  <Spin />                )}              </div>            </div>            <Button              type="default"              size="large"              onClick={() => navigate("/home")}              style={{ marginTop: "10px" }}              block            >              Batalkan            </Button>          </Card>        </Col>
+                  <Spin />
+                )}{" "}
+              </div>{" "}
+            </div>{" "}
+            <Button
+              type="default"
+              size="large"
+              onClick={() => navigate("/home")}
+              style={{ marginTop: "10px" }}
+              block
+            >
+              {" "}
+              Batalkan{" "}
+            </Button>{" "}
+          </Card>{" "}
+        </Col>
       </Row>
     </div>
   );
