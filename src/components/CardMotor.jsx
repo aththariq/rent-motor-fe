@@ -12,6 +12,7 @@ import moment from "moment";
 const { RangePicker } = DatePicker;
 
 const CardMotor = ({
+  _id,
   name,
   type,
   image,
@@ -106,6 +107,7 @@ const CardMotor = ({
       formData.append("startDate", formattedStartDate);
       formData.append("endDate", formattedEndDate);
       formData.append("ktpImage", uploadedImage);
+      formData.append("motorId", _id); 
 
       console.log("Sending data:", Array.from(formData.entries()));
 
@@ -137,8 +139,8 @@ const CardMotor = ({
         });
         setIsOpen(false);
 
-        // Navigasi ke halaman payment dengan menyertakan orderId dan token di URL
-        const orderId = response.data.data.orderId; // Pastikan orderId tersedia di respons backend
+      
+        const orderId = response.data.data.order._id; 
         const token = localStorage.getItem("token");
 
         if (orderId && token) {
@@ -149,6 +151,8 @@ const CardMotor = ({
             message: "Gagal mendapatkan informasi order.",
             description: "Silakan coba lagi atau hubungi support.",
           });
+          console.log("orderid: ", orderId);
+          console.log("token: ", token);
         }
       } else {
         setAlert({
@@ -291,7 +295,7 @@ const CardMotor = ({
               multiple={false}
               action="https://api-motoran.faizath.com/orders"
               onChange={handleImageUpload}
-              beforeUpload={() => false} // Prevent automatic upload
+              beforeUpload={() => false} 
               className="mb-4"
             >
               <p className="ant-upload-drag-icon">

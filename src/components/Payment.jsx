@@ -87,7 +87,7 @@ const Payment = () => {
             setTotalPrice(total);
           } else {
             toast.error(response.data.message || "Gagal mengambil data order.");
-            navigate("/");
+            navigate("/home");
           }
         } catch (error) {
           console.error("Error fetching order data:", error);
@@ -95,13 +95,13 @@ const Payment = () => {
             error.response?.data?.message ||
               "Terjadi kesalahan saat mengambil data order."
           );
-          navigate("/");
+          navigate("/home");
         } finally {
           setFetching(false);
         }
       } else {
         toast.error("Data pesanan tidak ditemukan.");
-        navigate("/");
+        navigate("/home");
       }
     };
 
