@@ -20,8 +20,8 @@ function App() {
         <Route path="/product" element={<Cards />} />
         <Route path="/home" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="*" element={<NotFoundPage />} />
         <Route path="/payment" element={<Payment />} /> {/* Added payment route */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

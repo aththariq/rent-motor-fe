@@ -1,0 +1,11 @@
+
+{
+  "rewrites": [
+    { "source": "/payment/:path*", "destination": "/payment" },
+    { "source": "/login/:path*", "destination": "/login" },
+    { "source": "/signup/:path*", "destination": "/signup" },
+    { "source": "/home/:path*", "destination": "/home" },
+    { "source": "/admin/:path*", "destination": "/admin" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
