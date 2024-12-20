@@ -132,7 +132,8 @@ const Payment = () => {
         throw new Error("Order ID is undefined.");
       }
 
-      const response = await axios.post(
+      // Change the HTTP method from POST to PUT
+      const response = await axios.put(
         paymentEndpoint,
         {},
         {
