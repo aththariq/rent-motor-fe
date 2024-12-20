@@ -55,7 +55,7 @@ const Payment = () => {
   console.log("Fallback Token:", localStorage.getItem("token") || null);
 
   useEffect(() => {
-    if (order && motor) { // Ensure both order and motor exist
+    if (order && motor) { 
       setOrderData(order);
       setQrUrl(`https://api-motoran.faizath.com/orders/${order.orderId}`);
 
@@ -64,7 +64,7 @@ const Payment = () => {
         (new Date(order.returnDate) - new Date(order.takenDate)) /
           (1000 * 60 * 60 * 24)
       );
-      const total = rentalDays * motor.price; // Use motor.price from passed motor data
+      const total = rentalDays * motor.price; 
       setTotalPrice(total);
     } else {
       toast.error("Data pesanan atau motor tidak ditemukan.");
