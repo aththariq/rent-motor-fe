@@ -18,6 +18,7 @@ const Payment = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false); // Add payment loading state
 
   const [isMobile, setIsMobile] = useState(false);
   const [qrUrl, setQrUrl] = useState(null);
@@ -115,6 +116,39 @@ const Payment = () => {
     }
   }, [orderIdParam, tokenParam, navigate]);
 
+  // Add payment handler function
+  const handlePayment = async () => {
+    setPaymentLoading(true);
+    setPaymentError("");
+    try {
+      const paymentEndpoint = `https://api-motoran.faizath.com/payment/${orderData._id}/pay`;
+      const token = tokenParam || localStorage.getItem("token");
+
+      const response = await axios.post(
+        paymentEndpoint,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data.status === "success") {
+        setPaymentSuccess(true);
+        toast.success("Pembayaran berhasil dilakukan.");
+      } else {
+        throw new Error(response.data.message || "Pembayaran gagal.");
+      }
+    } catch (error) {
+      console.error("Payment Error:", error);
+      setPaymentError(error.response?.data?.message || "Pembayaran gagal.");
+      toast.error("Pembayaran gagal.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   // Update rendering to use motorData instead of motor
   if (!orderData || !motorData) {
     return (
@@ -136,11 +170,20 @@ const Payment = () => {
     <div style={{ padding: "24px", background: "#f0f2f5", minHeight: "100vh" }}>
       <Row justify="center">
         <Col xs={24} sm={20} md={16} lg={12}>
-          {/* Alert Sukses */}
+          {/* Alert Sukses Pembayaran */}
           {paymentSuccess && (
             <Alert
               message="Pembayaran Berhasil!"
-              description="Terima kasih telah melakukan pembayaran. Pesanan Anda telah berhasil dibuat."
+              description={
+                <>
+                  Terima kasih telah melakukan pembayaran. Pesanan Anda telah berhasil dibuat.
+                  <div className="mt-4">
+                    <Button type="primary" onClick={() => navigate("/home")}>
+                      Kembali ke Home
+                    </Button>
+                  </div>
+                </>
+              }
               type="success"
               showIcon
               closable
@@ -148,7 +191,7 @@ const Payment = () => {
               style={{ marginBottom: "20px" }}
             />
           )}
-          {/* Alert Error */}
+          {/* Alert Error Pembayaran */}
           {paymentError && (
             <Alert
               message="Gagal Membuat Order"
@@ -252,7 +295,8 @@ const Payment = () => {
               <Button
                 type="primary"
                 size="large"
-                onClick={() => (window.location.href = qrPaymentUrl)} // Redirect ke URL pembayaran
+                onClick={handlePayment} // Updated onClick handler
+                loading={paymentLoading} // Show loading state
                 block
               >
                 Bayar Sekarang
