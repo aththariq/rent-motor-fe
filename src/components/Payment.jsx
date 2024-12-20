@@ -79,7 +79,7 @@ const Payment = () => {
                 const motors = motorResponse.data.data.inventories;
                 const fetchedMotor = motors.find(
                   (motor) => motor._id === fetchedOrder.motorId
-                ); // Moved .find() outside headers
+                ); // Correct placement of .find()
 
                 if (fetchedMotor) {
                   setMotorData(fetchedMotor);
