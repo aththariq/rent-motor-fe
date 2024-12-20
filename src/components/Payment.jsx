@@ -53,17 +53,22 @@ const Payment = () => {
         },
       })
       .then(response => {
-        const fetchedOrder = response.data;
+        const fetchedOrder = response.data.data.order; // Access nested 'order'
         setOrderData(fetchedOrder);
-        setQrUrl(`https://yourfrontend.com/payment?orderId=${orderIdParam}`);
+        setQrUrl(`https://motoran.vercel.app/payment?orderId=${orderIdParam}`); // Updated frontend URL
 
-        // Hitung total harga
-        const rentalDays = Math.ceil(
-          (new Date(fetchedOrder.returnDate) - new Date(fetchedOrder.takenDate)) /
-            (1000 * 60 * 60 * 24)
-        );
-        const total = rentalDays * fetchedOrder.motor.price; // Adjust based on fetched data
-        setTotalPrice(total);
+        if (fetchedOrder.motor) { // Ensure 'motor' exists
+          // Hitung total harga
+          const rentalDays = Math.ceil(
+            (new Date(fetchedOrder.returnDate) - new Date(fetchedOrder.takenDate)) /
+              (1000 * 60 * 60 * 24)
+          );
+          const total = rentalDays * fetchedOrder.motor.price; // Use motor.price from fetched data
+          setTotalPrice(total);
+        } else {
+          toast.error("Data motor tidak ditemukan.");
+          navigate("/home");
+        }
       })
       .catch(error => {
         toast.error("Gagal mengambil data pesanan.");
@@ -137,22 +142,35 @@ const Payment = () => {
               style={{ marginBottom: "20px" }}
             >
               <Row gutter={[16, 16]}>
-                <Col span={8}>
-                  <Image
-                    src={motor.image}
-                    alt={motor.name}
-                    width={100}
-                    height={100}
-                    style={{ objectFit: "cover", borderRadius: "8px" }}
-                  />
-                </Col>
-                <Col span={16} className="flex flex-col justify-center">
-                  <Text strong>Nama:</Text> {motor.name}
-                  <br />
-                  <Text strong>Jenis:</Text> {motor.type}
-                  <br />
-                  <Text strong>Harga per hari:</Text> Rp{motor.price}
-                </Col>
+                {motor ? (
+                  <>
+                    <Col span={8}>
+                      <Image
+                        src={motor.image}
+                        alt={motor.name}
+                        width={100}
+                        height={100}
+                        style={{ objectFit: "cover", borderRadius: "8px" }}
+                      />
+                    </Col>
+                    <Col span={16} className="flex flex-col justify-center">
+                      <Text strong>Nama:</Text> {motor.name}
+                      <br />
+                      <Text strong>Jenis:</Text> {motor.type}
+                      <br />
+                      <Text strong>Harga per hari:</Text> Rp{motor.price}
+                    </Col>
+                  </>
+                ) : (
+                  <Col span={24}>
+                    <Alert
+                      message="Data Motor Tidak Ditemukan"
+                      description="Detail motor tidak tersedia."
+                      type="error"
+                      showIcon
+                    />
+                  </Col>
+                )}
               </Row>
             </Card>
 
