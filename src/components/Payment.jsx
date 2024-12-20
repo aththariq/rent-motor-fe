@@ -48,56 +48,68 @@ const Payment = () => {
 
     // Fetch order data from backend
     if (orderIdParam) {
-      axios.get(`https://api-motoran.faizath.com/orders/${orderIdParam}`, {
-        headers: {
-          Authorization: `Bearer ${tokenParam || localStorage.getItem("token")}`,
-        },
-      })
-      .then(response => {
-        const fetchedOrder = response.data.data.order; // Access nested 'order'
-        setOrderData(fetchedOrder);
-        setQrUrl(`https://motoran.vercel.app/payment?orderId=${orderIdParam}`); // Updated frontend URL
+      axios
+        .get(`https://api-motoran.faizath.com/orders/${orderIdParam}`, {
+          headers: {
+            Authorization: `Bearer ${
+              tokenParam || localStorage.getItem("token")
+            }`,
+          },
+        })
+        .then((response) => {
+          const fetchedOrder = response.data.data.order; // Access nested 'order'
+          setOrderData(fetchedOrder);
+          setQrUrl(
+            `https://motoran.vercel.app/payment?orderId=${orderIdParam}&token=${tokenParam}`
+          ); // Added token to QR URL
 
-        if (fetchedOrder.motorId) { // Ensure 'motorId' exists in orderData
-          // Fetch motor data from /inventories
-          axios.get('https://api-motoran.faizath.com/inventories', {
-            headers: {
-              Authorization: `Bearer ${tokenParam || localStorage.getItem("token")}`,
-            },
-          })
-          .then(motorResponse => {
-            const motors = motorResponse.data.data.inventories;
-            const fetchedMotor = motors.find(motor => motor._id === fetchedOrder.motorId);
-            
-            if (fetchedMotor) {
-              setMotorData(fetchedMotor);
+          if (fetchedOrder.motorId) {
+            // Ensure 'motorId' exists in orderData
+            // Fetch motor data from /inventories
+            axios
+              .get("https://api-motoran.faizath.com/inventories", {
+                headers: {
+                  Authorization: `Bearer ${
+                    tokenParam || localStorage.getItem("token")
+                  }`,
+                },
+              })
+              .then((motorResponse) => {
+                const motors = motorResponse.data.data.inventories;
+                const fetchedMotor = motors.find(
+                  (motor) => motor._id === fetchedOrder.motorId
+                );
 
-              // Hitung total harga
-              const rentalDays = Math.ceil(
-                (new Date(fetchedOrder.returnDate) - new Date(fetchedOrder.takenDate)) /
-                  (1000 * 60 * 60 * 24)
-              );
-              const total = rentalDays * fetchedMotor.price; // Use motor.price from fetched data
-              setTotalPrice(total);
-            } else {
-              toast.error("Data motor tidak ditemukan.");
-              navigate("/home");
-            }
-          })
-          .catch(motorError => {
-            console.error(motorError);
-            toast.error("Gagal mengambil data motor.");
+                if (fetchedMotor) {
+                  setMotorData(fetchedMotor);
+
+                  // Hitung total harga
+                  const rentalDays = Math.ceil(
+                    (new Date(fetchedOrder.returnDate) -
+                      new Date(fetchedOrder.takenDate)) /
+                      (1000 * 60 * 60 * 24)
+                  );
+                  const total = rentalDays * fetchedMotor.price; // Use motor.price from fetched data
+                  setTotalPrice(total);
+                } else {
+                  toast.error("Data motor tidak ditemukan.");
+                  navigate("/home");
+                }
+              })
+              .catch((motorError) => {
+                console.error(motorError);
+                toast.error("Gagal mengambil data motor.");
+                navigate("/home");
+              });
+          } else {
+            toast.error("Data motorId tidak ditemukan.");
             navigate("/home");
-          });
-        } else {
-          toast.error("Data motorId tidak ditemukan.");
+          }
+        })
+        .catch((error) => {
+          toast.error("Gagal mengambil data pesanan.");
           navigate("/home");
-        }
-      })
-      .catch(error => {
-        toast.error("Gagal mengambil data pesanan.");
-        navigate("/home");
-      });
+        });
     }
   }, [orderIdParam, tokenParam, navigate]);
 
