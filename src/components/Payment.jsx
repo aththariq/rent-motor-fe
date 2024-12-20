@@ -21,6 +21,7 @@ const Payment = () => {
 
   const [isMobile, setIsMobile] = useState(false);
   const [qrUrl, setQrUrl] = useState(null);
+  const [motorData, setMotorData] = useState(null); // Add motorData state
 
   useEffect(() => {
     const handleResize = () => {
@@ -57,16 +58,39 @@ const Payment = () => {
         setOrderData(fetchedOrder);
         setQrUrl(`https://motoran.vercel.app/payment?orderId=${orderIdParam}`); // Updated frontend URL
 
-        if (fetchedOrder.motor) { // Ensure 'motor' exists
-          // Hitung total harga
-          const rentalDays = Math.ceil(
-            (new Date(fetchedOrder.returnDate) - new Date(fetchedOrder.takenDate)) /
-              (1000 * 60 * 60 * 24)
-          );
-          const total = rentalDays * fetchedOrder.motor.price; // Use motor.price from fetched data
-          setTotalPrice(total);
+        if (fetchedOrder.motorId) { // Ensure 'motorId' exists in orderData
+          // Fetch motor data from /inventories
+          axios.get('https://api-motoran.faizath.com/inventories', {
+            headers: {
+              Authorization: `Bearer ${tokenParam || localStorage.getItem("token")}`,
+            },
+          })
+          .then(motorResponse => {
+            const motors = motorResponse.data.data.inventories;
+            const fetchedMotor = motors.find(motor => motor._id === fetchedOrder.motorId);
+            
+            if (fetchedMotor) {
+              setMotorData(fetchedMotor);
+
+              // Hitung total harga
+              const rentalDays = Math.ceil(
+                (new Date(fetchedOrder.returnDate) - new Date(fetchedOrder.takenDate)) /
+                  (1000 * 60 * 60 * 24)
+              );
+              const total = rentalDays * fetchedMotor.price; // Use motor.price from fetched data
+              setTotalPrice(total);
+            } else {
+              toast.error("Data motor tidak ditemukan.");
+              navigate("/home");
+            }
+          })
+          .catch(motorError => {
+            console.error(motorError);
+            toast.error("Gagal mengambil data motor.");
+            navigate("/home");
+          });
         } else {
-          toast.error("Data motor tidak ditemukan.");
+          toast.error("Data motorId tidak ditemukan.");
           navigate("/home");
         }
       })
@@ -83,7 +107,8 @@ const Payment = () => {
   console.log("Order Data:", orderData);
   console.log("Fallback Token:", localStorage.getItem("token") || null);
 
-  if (!orderData) {
+  // Update rendering to use motorData instead of motor
+  if (!orderData || !motorData) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
@@ -91,7 +116,7 @@ const Payment = () => {
     );
   }
 
-  const { phoneNumber, takenDate, returnDate, motor } = orderData;
+  const { phoneNumber, takenDate, returnDate } = orderData;
 
   const rentalDays = Math.ceil(
     (new Date(returnDate) - new Date(takenDate)) / (1000 * 60 * 60 * 24)
@@ -142,23 +167,23 @@ const Payment = () => {
               style={{ marginBottom: "20px" }}
             >
               <Row gutter={[16, 16]}>
-                {motor ? (
+                {motorData ? (
                   <>
                     <Col span={8}>
                       <Image
-                        src={motor.image}
-                        alt={motor.name}
+                        src={motorData.image}
+                        alt={motorData.name}
                         width={100}
                         height={100}
                         style={{ objectFit: "cover", borderRadius: "8px" }}
                       />
                     </Col>
                     <Col span={16} className="flex flex-col justify-center">
-                      <Text strong>Nama:</Text> {motor.name}
+                      <Text strong>Nama:</Text> {motorData.name}
                       <br />
-                      <Text strong>Jenis:</Text> {motor.type}
+                      <Text strong>Jenis:</Text> {motorData.type}
                       <br />
-                      <Text strong>Harga per hari:</Text> Rp{motor.price}
+                      <Text strong>Harga per hari:</Text> Rp{motorData.price}
                     </Col>
                   </>
                 ) : (
